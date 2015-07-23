@@ -3,6 +3,8 @@
 # Function:
 #   Generate a vivado project for the loRISC SoC
 
+set mem_data_width 128.0
+set axi_id_width 5.0
 
 set origin_dir "."
 set project_name "lowrisc-chip-imp"
@@ -12,13 +14,13 @@ set common_dir "../../common"
 set orig_proj_dir [file normalize $origin_dir/$project_name]
 
 # Create project
-create_project project_name $origin_dir/$project_name
+create_project $project_name $origin_dir/$project_name
 
 # Set the directory path for the new project
 set proj_dir [get_property directory [current_project]]
 
 # Set project properties
-set obj [get_projects $proj_name]
+set obj [get_projects $project_name]
 set_property "board_part" "xilinx.com:kc705:part0:1.1" $obj
 set_property "default_lib" "xil_defaultlib" $obj
 set_property "simulator_language" "Mixed" $obj
