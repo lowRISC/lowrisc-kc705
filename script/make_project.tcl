@@ -3,11 +3,12 @@
 # Function:
 #   Generate a vivado project for the loRISC SoC
 
-set mem_data_width 128.0
-set axi_id_width 5.0
+set mem_data_width {128}
+set axi_id_width {5}
 
 set origin_dir "."
-set project_name "lowrisc-chip-imp"
+set project_name [lindex $argv 0]
+set CONFIG [lindex $argv 1]
 set common_dir "../../common"
 
 # Set the directory path for the original project from where this script was exported
@@ -31,25 +32,20 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 }
 
 # Set 'sources_1' fileset object
-set obj [get_filesets sources_1]
-#set files [list \
-# "[file normalize "$origin_dir/src/uart.v"]"\
-# "[file normalize "$origin_dir/src/uart_wrapper.sv"]"\
-# "[file normalize "$origin_dir/src/uart_writer.sv"]"\
-# "[file normalize "$origin_dir/src/uart_reader.sv"]"\
-# "[file normalize "$origin_dir/src/uart_device.sv"]"\
-# "[file normalize "$origin_dir/src/rocket.v"]"\
-# "[file normalize "$origin_dir/src/top.sv"]"\
-#]
-#add_files -norecurse -fileset $obj $files
+set files [list \
+ [file normalize $origin_dir/../../../fsim/generated-src/Top.$CONFIG.v] \
+ [file normalize $origin_dir/../../../vsrc/chip_top.sv] \
+]
+add_files -norecurse -fileset [get_filesets sources_1] $files
 
-# add ./mem into search path
-#set obj [get_filesets sources_1]
-#set_property include_dirs $origin_dir/mem $obj
+# add include path
+set_property include_dirs [list \
+                               $origin_dir/src \
+                               $origin_dir/../../../fsim/generated-src \
+                               ] [get_filesets sources_1]
 
 # Set 'sources_1' fileset properties
-set obj [get_filesets sources_1]
-set_property "top" "chip_top" $obj
+set_property "top" "chip_top" [get_filesets sources_1]
 
 #UART
 create_ip -name axi_uart16550 -vendor xilinx.com -library ip -version 2.0 -module_name axi_uart16550_0
@@ -58,13 +54,13 @@ set_property -dict [list \
                         CONFIG.C_S_AXI_ACLK_FREQ_HZ_d {200} \
                        ] [get_ips axi_uart16550_0]
 generate_target {instantiation_template} \
-    [get_files $proj_dir/$project_name.scrs/sources_1/ip/axi_uart16550_0/axi_uart16550_0.xci]
+    [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_uart16550_0/axi_uart16550_0.xci]
 
 #BRAM Controller
 create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -version 4.0 -module_name axi_bram_ctrl_0
 set_property -dict [list \
-                        CONFIG.DATA_WIDTH {$mem_data_width} \
-                        CONFIG.ID_WIDTH {$axi_id_width} \
+                        CONFIG.DATA_WIDTH $mem_data_width \
+                        CONFIG.ID_WIDTH $axi_id_width \
                         CONFIG.PROTOCOL {AXI4} \
                         CONFIG.BMG_INSTANCE {EXTERNAL} \
                         CONFIG.SINGLE_PORT_BRAM {1} \
@@ -72,7 +68,7 @@ set_property -dict [list \
                         CONFIG.ECC_TYPE {0} \
                        ] [get_ips axi_bram_ctrl_0]
 generate_target {instantiation_template} \
-    [get_files $proj_dir/$project_name.scrs/sources_1/ip/axi_bram_ctrl_0/axi_bram_ctrl_0.xci]
+    [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_bram_ctrl_0/axi_bram_ctrl_0.xci]
 
 #MMCM Clock Controller
 create_ip -name clk_wiz -vendor xilinx.com -library ip -version 5.1 -module_name clk_wiz_0
@@ -91,7 +87,7 @@ set_property -dict [list \
                         CONFIG.CLKOUT1_PHASE_ERROR {89.971}] \
     [get_ips clk_wiz_0]
 generate_target {instantiation_template} \
-    [get_files $proj_dir/$project_name.scrs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci]
+    [get_files $proj_dir/$project_name.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci]
 
 # Create 'constrs_1' fileset (if not found)
 #if {[string equal [get_filesets -quiet constrs_1] ""]} {
@@ -107,9 +103,9 @@ generate_target {instantiation_template} \
 
 
 # Create 'sim_1' fileset (if not found)
-#if {[string equal [get_filesets -quiet sim_1] ""]} {
-#  create_fileset -simset sim_1
-#}
+if {[string equal [get_filesets -quiet sim_1] ""]} {
+  create_fileset -simset sim_1
+}
 
 # Set 'sim_1' fileset object
 #set obj [get_filesets sim_1]
@@ -117,5 +113,11 @@ generate_target {instantiation_template} \
 # "[file normalize "$origin_dir/tb/tb.sv"]"\
 #]
 #add_files -norecurse -fileset $obj $files
+
+# add include path
+set_property include_dirs [list \
+                               $origin_dir/src \
+                               $origin_dir/../../../fsim/generated-src \
+                               ] [get_filesets sim_1]
 
 #set_property "tb" "tb" $obj
