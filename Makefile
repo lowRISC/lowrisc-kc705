@@ -11,6 +11,7 @@ verilog_lowrisc = ../../../fsim/generated-src/Top.$(CONFIG).v
 verilog_srcs = \
 	$(verilog_lowrisc) \
 	../../../vsrc/chip_top.sv \
+	../../../socip/nasti/channel.sv \
 	src/config.vh \
 
 
@@ -19,7 +20,7 @@ default: project
 #---------- Project generation ---------
 project = $(project_name)/$(project_name).xpr
 project: $(project)
-$(project):
+$(project): | $(verilog_lowrisc)
 	$(VIVADO) -mode batch -source script/make_project.tcl -tclargs $(project_name) $(CONFIG)
 
 vivado: $(project)

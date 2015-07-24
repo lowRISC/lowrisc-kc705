@@ -4,7 +4,7 @@
 #   Generate a vivado project for the loRISC SoC
 
 set mem_data_width {128}
-set axi_id_width {5}
+set axi_id_width {8}
 
 set origin_dir "."
 set project_name [lindex $argv 0]
@@ -33,16 +33,17 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 
 # Set 'sources_1' fileset object
 set files [list \
- [file normalize $origin_dir/../../../fsim/generated-src/Top.$CONFIG.v] \
- [file normalize $origin_dir/../../../vsrc/chip_top.sv] \
-]
+               [file normalize $origin_dir/../../../fsim/generated-src/Top.$CONFIG.v] \
+               [file normalize $origin_dir/../../../vsrc/chip_top.sv] \
+               [file normalize $origin_dir/../../../socip/nasti/channel.sv] \
+              ]
 add_files -norecurse -fileset [get_filesets sources_1] $files
 
 # add include path
 set_property include_dirs [list \
-                               $origin_dir/src \
-                               $origin_dir/../../../fsim/generated-src \
-                               ] [get_filesets sources_1]
+                               [file normalize $origin_dir/src ]\
+                               [file normalize $origin_dir/../../../fsim/generated-src] \
+                              ] [get_filesets sources_1]
 
 # Set 'sources_1' fileset properties
 set_property "top" "chip_top" [get_filesets sources_1]
@@ -116,8 +117,13 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 
 # add include path
 set_property include_dirs [list \
-                               $origin_dir/src \
-                               $origin_dir/../../../fsim/generated-src \
-                               ] [get_filesets sim_1]
+                               [file normalize $origin_dir/src] \
+                               [file normalize $origin_dir/../../../fsim/generated-src] \
+                              ] [get_filesets sim_1]
 
 #set_property "tb" "tb" $obj
+
+# suppress some not very useful messages
+set_msg_config -id "\[Synth 8-350\]" -suppress
+
+#set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
