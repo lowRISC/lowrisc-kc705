@@ -10,36 +10,31 @@ default: all
 
 RISCV_PREFIX=riscv64-unknown-elf-
 RISCV_GCC = $(RISCV_PREFIX)gcc
-RISCV_LINUX_PREFIX=riscv-linux-
-RISCV_LINUX_GCC = $(RISCV_LINUX_PREFIX)gcc
+RISCV_GCC_OPTS = -static -Wa,-march=RVIMAFD -std=gnu99 -O2 -ffast-math -fno-common -fno-builtin-printf -I../common -I../drive -I../../riscv-tests/env
+RISCV_LINK = $(RISCV_GCC) -T ../common/test.ld
+RISCV_LINK_OPTS = -nostdlib -nostartfiles -ffast-math -lc -lgcc
 
-RISCV_GCC_OPTS = -std=gnu99 -O3 -DPREALLOCATE=1
-RISCV_GCC_BARE_LNK_OPTS = -nostdlib -nostartfiles -lc
-RISCV_LINUX_GCC_OPTS = -I.. -O3 -static
 
 #--------------------------------------------------------------------
 # Build
 #--------------------------------------------------------------------
 
-hello.bare: hello.bare.o syscalls.o crt.o 
-	$(RISCV_GCC) -T ./common/test.ld $^ -o $@ $(RISCV_GCC_BARE_LNK_OPTS)
+hello: hello.o uart.o syscalls.o crt.o
+	$(RISCV_LINK) -o $@ $^ $(RISCV_LINK_OPTS)
 
-hello.bare.o:hello.c
+hello.o:hello.c
 	$(RISCV_GCC) -static -DBARE_MODE $(RISCV_GCC_OPTS) -c $< -o $@
 
-syscalls.o:common/syscalls.c
-	$(RISCV_GCC) -static -Icommon -Ienv $(RISCV_GCC_OPTS) -c $< -o $@
+syscalls.o:../common/syscalls.c
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
-crt.o:common/crt.S
-	$(RISCV_GCC) -static -Icommon -Ienv $(RISCV_GCC_OPTS) -c $< -o $@
+crt.o:../common/crt.S
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
-hello.pk: hello.c
-	$(RISCV_GCC) $(RISCV_GCC_OPTS) $< -o $@
+uart.o:../drive/uart.c ../drive/uart.h ../drive/device_map.h
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
-hello.linux: hello.c
-	$(RISCV_LINUX_GCC) $(RISCV_LINUX_GCC_OPTS) $< -o $@
-
-all: hello.bare hello.pk hello.linux
+all: hello
 
 clean:
-	rm -fr *.o hello.bare hello.linux hello.pk
+	rm -fr *.o hello
