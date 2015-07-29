@@ -34,7 +34,10 @@ crt.o:../common/crt.S
 uart.o:../drive/uart.c ../drive/uart.h ../drive/device_map.h
 	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
-all: hello
+hello.hex: hello
+	elf2hex 16 512 $< > $@
+
+all: hello.hex
 
 clean:
-	rm -fr *.o hello
+	rm -fr *.o hello hello.hex
