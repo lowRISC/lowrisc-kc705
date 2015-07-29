@@ -109,11 +109,11 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 }
 
 # Set 'sim_1' fileset object
-#set obj [get_filesets sim_1]
-#set files [list \
-# "[file normalize "$origin_dir/tb/tb.sv"]"\
-#]
-#add_files -norecurse -fileset $obj $files
+set obj [get_filesets sim_1]
+set files [list \
+               [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
+              ]
+add_files -norecurse -fileset $obj $files
 
 # add include path
 set_property include_dirs [list \
@@ -121,9 +121,10 @@ set_property include_dirs [list \
                                [file normalize $origin_dir/../../../fsim/generated-src] \
                               ] [get_filesets sim_1]
 
-#set_property "tb" "tb" $obj
+set_property "tb" "tb" $obj
 
 # suppress some not very useful messages
 set_msg_config -id "\[Synth 8-350\]" -suppress
 
-#set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
+# do not flatten design
+set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
