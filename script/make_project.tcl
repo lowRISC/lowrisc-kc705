@@ -35,6 +35,7 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 set files [list \
                [file normalize $origin_dir/../../../fsim/generated-src/Top.$CONFIG.v] \
                [file normalize $origin_dir/../../../vsrc/chip_top.sv] \
+               [file normalize $origin_dir/../../../vsrc/axi_bram_ctrl_top.sv] \
                [file normalize $origin_dir/../../../socip/nasti/channel.sv] \
               ]
 add_files -norecurse -fileset [get_filesets sources_1] $files
@@ -62,6 +63,7 @@ create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -version 4.0 -modul
 set_property -dict [list \
                         CONFIG.DATA_WIDTH $mem_data_width \
                         CONFIG.ID_WIDTH $axi_id_width \
+                        CONFIG.MEM_DEPTH {1024} \
                         CONFIG.PROTOCOL {AXI4} \
                         CONFIG.BMG_INSTANCE {EXTERNAL} \
                         CONFIG.SINGLE_PORT_BRAM {1} \
@@ -120,6 +122,9 @@ set_property include_dirs [list \
                                [file normalize $origin_dir/src] \
                                [file normalize $origin_dir/../../../fsim/generated-src] \
                               ] [get_filesets sim_1]
+set_property verilog_define [list \
+                                 SIMULATION \
+                                ] [get_filesets sim_1]
 
 set_property "tb" "tb" $obj
 
