@@ -106,27 +106,27 @@ generate_target {instantiation_template} \
 
 
 # Create 'sim_1' fileset (if not found)
-if {[string equal [get_filesets -quiet sim_1] ""]} {
-  create_fileset -simset sim_1
-}
+#if {[string equal [get_filesets -quiet sim_1] ""]} {
+#  create_fileset -simset sim_1
+#}
 
 # Set 'sim_1' fileset object
-set obj [get_filesets sim_1]
-set files [list \
-               [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
-              ]
-add_files -norecurse -fileset $obj $files
+#set obj [get_filesets sim_1]
+#set files [list \
+#               [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
+#              ]
+#add_files -norecurse -fileset $obj $files
 
 # add include path
-set_property include_dirs [list \
-                               [file normalize $origin_dir/src] \
-                               [file normalize $origin_dir/../../../fsim/generated-src] \
-                              ] [get_filesets sim_1]
-set_property verilog_define [list \
-                                 SIMULATION \
-                                ] [get_filesets sim_1]
-
-set_property "tb" "tb" $obj
+#set_property include_dirs [list \
+#                               [file normalize $origin_dir/src] \
+#                               [file normalize $origin_dir/../../../fsim/generated-src] \
+#                              ] [get_filesets sim_1]
+#set_property verilog_define [list \
+#                                 SIMULATION \
+#                                ] [get_filesets sim_1]
+#
+#set_property "tb" "tb" $obj
 
 # suppress some not very useful messages
 set_msg_config -id "\[Synth 8-350\]" -suppress
