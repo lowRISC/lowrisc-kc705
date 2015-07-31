@@ -10,6 +10,13 @@ project_name=lowrisc-chip-imp
 sim_path=$orig_path/$project_name/$project_name.sim
 src_path=$orig_path/$project_name/$project_name.srcs
 
+# check Xilinx Vivado is available
+if [ "$XILINX_VIVADO" == "" ]
+then
+    "Error: Xilinx Vivado not available!"
+    exit 1
+fi
+
 # build the simulation path
 if [ ! -e $sim_path ]
 then 
@@ -29,7 +36,7 @@ svlog_srcs=(
 
 vlog_srcs=(
     $orig_path/../../../fsim/generated-src/Top.DefaultConfig.v
-    $orig_path/src/glbl.v
+    $XILINX_VIVADO/data/verilog/src/glbl.v
 )
 
 bram_srcs=(
