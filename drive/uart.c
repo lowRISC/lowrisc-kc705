@@ -1,14 +1,14 @@
 
 #include "uart.h"
 
-uint32_t * get_uart_base() {
+volatile uint32_t * get_uart_base() {
   return (uint32_t *)(UART_BASE);
 }
 
 void uart_init() {
   
   // get a base pointer
-  uint32_t *uart_base_ptr = get_uart_base();
+  volatile uint32_t *uart_base_ptr = get_uart_base();
 
   // set 0x0080 to UART.LCR to enable DLL and DLM write
   // configure baud rate
@@ -29,26 +29,22 @@ void uart_init() {
 
 void uart_send(uint8_t data) {
   // get a base pointer
-  uint32_t *uart_base_ptr = get_uart_base();
+  volatile uint32_t *uart_base_ptr = get_uart_base();
 
   // wait until THR empty
   uint32_t status;
-  do {
-    status = *(uart_base_ptr + UART_LSR);
-  } while(! (status & 0x40u));
+  while(! (*(uart_base_ptr + UART_LSR) & 0x40u)) { }
 
   *(uart_base_ptr + UART_THR) = data;
 }
 
 uint8_t uart_recv() {
   // get a base pointer
-  uint32_t *uart_base_ptr = get_uart_base();
+  volatile uint32_t *uart_base_ptr = get_uart_base();
 
   // wait until RBR has data
   uint32_t status;
-  do {
-    status = *(uart_base_ptr + UART_LSR);
-  } while(! (status & 0x01u));
+  while(! (*(uart_base_ptr + UART_LSR) & 0x01u)) { }
 
   return *(uart_base_ptr + UART_RBR);
 
