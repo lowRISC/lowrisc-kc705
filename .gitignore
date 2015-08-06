@@ -1,5 +1,6 @@
 *.jou
 *.log
+*.str
 lowrisc-chip-imp
 src/boot.mem
 

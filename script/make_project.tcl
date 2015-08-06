@@ -83,8 +83,8 @@ set_property -dict [list \
                         CONFIG.PRIM_IN_FREQ {200} \
                         CONFIG.CLKIN1_JITTER_PS {50.0} \
                         CONFIG.MMCM_CLKFBOUT_MULT_F {5.000} \
-                        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {100.000} \
-                        CONFIG.MMCM_CLKOUT0_DIVIDE_F {10.000} \
+                        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {50.000} \
+                        CONFIG.MMCM_CLKOUT0_DIVIDE_F {20.000} \
                         CONFIG.MMCM_CLKIN1_PERIOD {5.0} ] \
     [get_ips clk_wiz_0]
 generate_target {instantiation_template} \
