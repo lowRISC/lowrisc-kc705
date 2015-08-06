@@ -31,7 +31,7 @@ static long handle_frontend_syscall(long which, long arg0, long arg1, long arg2)
 
   // currently it must be SYS_write
   char *s = (char *)arg1;
-  while(arg2) {
+  while(arg2--) {
     uart_send(*s++);
   }
 
