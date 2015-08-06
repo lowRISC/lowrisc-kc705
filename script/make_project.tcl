@@ -109,9 +109,10 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 }
 
 # Set 'sim_1' fileset object
-#set obj [get_filesets sim_1]
+set obj [get_filesets sim_1]
 set files [list \
                [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
+               [file normalize $origin_dir/src/boot.mem] \
               ]
 add_files -norecurse -fileset $obj $files
 

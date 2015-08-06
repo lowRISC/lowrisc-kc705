@@ -169,6 +169,9 @@ do
 done
 
 # elaborate the design
-xelab -m64 -debug all --timescale 1ns/1ps -L blk_mem_gen_v8_2 -L axi_bram_ctrl_v4_0 -L xil_defaultlib -L axi_lite_ipif_v3_0 -L lib_cdc_v1_0 -L lib_pkg_v1_0 -L lib_srl_fifo_v1_0 -L axi_uart16550_v2_0 -L unisims_ver -L unimacro_ver -L secureip --snapshot lowrisc-chip-behav-vcd xil_defaultlib.tb xil_defaultlib.glbl
+xelab -m64 -debug all --timescale 1ns/1ps -L blk_mem_gen_v8_2 -L axi_bram_ctrl_v4_0 -L xil_defaultlib -L axi_lite_ipif_v3_0 -L lib_cdc_v1_0 -L lib_pkg_v1_0 -L lib_srl_fifo_v1_0 -L axi_uart16550_v2_0 -L unisims_ver -L unimacro_ver -L secureip --snapshot $project_name-behav-vcd xil_defaultlib.tb xil_defaultlib.glbl
+
+# link the boot.mem
+ln -s $orig_path/src/boot.mem boot.mem
 
 cd $orig_path

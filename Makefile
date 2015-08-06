@@ -27,8 +27,16 @@ vivado: $(project)
 
 bitstream = $(project_name)/$(project_name).runs/impl_1/chip_top.bit
 bitstream: $(bitstream)
-$(bitstream): $(verilog_lowrisc) | $(project)
+$(bitstream): $(verilog_lowrisc) $(verilog_srcs) | $(project)
 	$(VIVADO) -mode batch -source ../../common/script/make_bitstream.tcl -tclargs $(project_name)
+
+simulation = $(project_name)/$(project_name).sim/xsim.dir/$(project_name)-behav-vcd
+simulation: $(simulation)
+$(simulation): $(verilog_lowrisc) $(verilog_srcs) | $(project)
+	./script/make_simulation.sh
+
+sim-run: | $(simulation)
+	cd $(project_name)/$(project_name).sim; xsim -g $(project_name)-behav-vcd &
 
 #---------- Source files ---------
 rocket: $(verilog_lowrisc)
@@ -42,4 +50,4 @@ clean:
 cleanall: clean
 	rm -fr $(project_name)
 
-.PHONY: vivado bitstream rocket clean cleanall
+.PHONY: vivado bitstream simulation sim-run rocket clean cleanall
