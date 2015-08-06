@@ -83,53 +83,69 @@ set_property -dict [list \
                         CONFIG.PRIM_IN_FREQ {200} \
                         CONFIG.CLKIN1_JITTER_PS {50.0} \
                         CONFIG.MMCM_CLKFBOUT_MULT_F {5.000} \
-                        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {50.000} \
-                        CONFIG.MMCM_CLKOUT0_DIVIDE_F {20.000} \
-                        CONFIG.MMCM_CLKIN1_PERIOD {5.0} \
-                        CONFIG.CLKOUT1_JITTER {129.198} \
-                        CONFIG.CLKOUT1_PHASE_ERROR {89.971}] \
+                        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {100.000} \
+                        CONFIG.MMCM_CLKOUT0_DIVIDE_F {10.000} \
+                        CONFIG.MMCM_CLKIN1_PERIOD {5.0} ] \
     [get_ips clk_wiz_0]
 generate_target {instantiation_template} \
     [get_files $proj_dir/$project_name.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci]
 
 # Create 'constrs_1' fileset (if not found)
-#if {[string equal [get_filesets -quiet constrs_1] ""]} {
-#  create_fileset -constrset constrs_1
-#}
+if {[string equal [get_filesets -quiet constrs_1] ""]} {
+  create_fileset -constrset constrs_1
+}
 
 # Set 'constrs_1' fileset object
-#set obj [get_filesets constrs_1]
+set obj [get_filesets constrs_1]
 
 # Add/Import constrs file and set constrs file properties
-#set file "[file normalize "$origin_dir/const/axi_uart_imp.xdc"]"
-#set file_added [add_files -norecurse -fileset $obj $file]
+set file "[file normalize "$origin_dir/constraint/pin_plan.xdc"]"
+set file_added [add_files -norecurse -fileset $obj $file]
 
 
 # Create 'sim_1' fileset (if not found)
-#if {[string equal [get_filesets -quiet sim_1] ""]} {
-#  create_fileset -simset sim_1
-#}
+if {[string equal [get_filesets -quiet sim_1] ""]} {
+  create_fileset -simset sim_1
+}
 
 # Set 'sim_1' fileset object
 #set obj [get_filesets sim_1]
-#set files [list \
-#               [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
-#              ]
-#add_files -norecurse -fileset $obj $files
+set files [list \
+               [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
+              ]
+add_files -norecurse -fileset $obj $files
 
 # add include path
-#set_property include_dirs [list \
-#                               [file normalize $origin_dir/src] \
-#                               [file normalize $origin_dir/../../../fsim/generated-src] \
-#                              ] [get_filesets sim_1]
-#set_property verilog_define [list \
-#                                 SIMULATION \
-#                                ] [get_filesets sim_1]
-#
-#set_property "tb" "tb" $obj
+set_property include_dirs [list \
+                               [file normalize $origin_dir/src] \
+                               [file normalize $origin_dir/../../../fsim/generated-src] \
+                              ] [get_filesets sim_1]
+set_property verilog_define [list \
+                                 SIMULATION \
+                                ] [get_filesets sim_1]
+
+set_property "tb" "tb" $obj
 
 # suppress some not very useful messages
+# warning partial connection
 set_msg_config -id "\[Synth 8-350\]" -suppress
+# info do synthesis
+set_msg_config -id "\[Synth 8-256\]" -suppress
+set_msg_config -id "\[Synth 8-638\]" -suppress
+# BRAM mapped to LUT due to optimization
+set_msg_config -id "\[Synth 8-3969\]" -suppress
+# BRAM with no output register
+set_msg_config -id "\[Synth 8-4480\]" -suppress
+# DSP without input pipelining
+set_msg_config -id "\[Drc 23-20\]" -suppress
+# Update IP version
+set_msg_config -id "\[Netlist 29-345\]" -suppress
+
 
 # do not flatten design
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
+
+# generate all IP source code
+generate_target -quiet all [get_ips]
+
+

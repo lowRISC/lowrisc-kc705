@@ -14,7 +14,6 @@ verilog_srcs = \
 	../../../socip/nasti/channel.sv \
 	src/config.vh \
 
-
 default: project
 
 #---------- Project generation ---------
@@ -25,6 +24,11 @@ $(project): | $(verilog_lowrisc)
 
 vivado: $(project)
 	$(VIVADO) $(project) &
+
+bitstream = $(project_name)/$(project_name).runs/impl_1/chip_top.bit
+bitstream: $(bitstream)
+$(bitstream): $(verilog_lowrisc) | $(project)
+	$(VIVADO) -mode batch -source ../../common/script/make_bitstream.tcl -tclargs $(project_name)
 
 #---------- Source files ---------
 rocket: $(verilog_lowrisc)
@@ -38,4 +42,4 @@ clean:
 cleanall: clean
 	rm -fr $(project_name)
 
-.PHONY: vivado rocket clean cleanall
+.PHONY: vivado bitstream rocket clean cleanall
