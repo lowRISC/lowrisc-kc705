@@ -90,6 +90,35 @@ set_property -dict [list \
 generate_target {instantiation_template} \
     [get_files $proj_dir/$project_name.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci]
 
+# Memory Controller
+create_ip -name mig_7series -vendor xilinx.com -library ip -version 2.3 -module_name mig_7series_0
+set_property CONFIG.XML_INPUT_FILE [file normalize $origin_dir/script/mig_config.prj] [get_ips mig_7series_0]
+generate_target {instantiation_template} \
+    [get_files $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0.xci]
+
+# AXI Crossbar
+create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name axi_crossbar_0
+set_property -dict [list \
+                        CONFIG.STRATEGY {2} \
+                        CONFIG.DATA_WIDTH {128} \
+                        CONFIG.ID_WIDTH {8} \
+                        CONFIG.S00_WRITE_ACCEPTANCE {2} \
+                        CONFIG.S00_READ_ACCEPTANCE {2} \
+                        CONFIG.M00_WRITE_ISSUING {1} \
+                        CONFIG.M01_WRITE_ISSUING {2} \
+                        CONFIG.M00_READ_ISSUING {1} \
+                        CONFIG.M00_A00_ADDR_WIDTH {14} \
+                        CONFIG.M01_READ_ISSUING {2} \
+                        CONFIG.M01_A00_BASE_ADDR {0x0000000040000000} \
+                        CONFIG.M01_A00_ADDR_WIDTH {30} \
+                        CONFIG.CONNECTIVITY_MODE {SAMD} \
+                        CONFIG.S00_THREAD_ID_WIDTH {8} \
+                        CONFIG.S01_WRITE_ACCEPTANCE {4} \
+                        CONFIG.S01_READ_ACCEPTANCE {4} \
+                        CONFIG.S01_BASE_ID {0x00000100} ] \
+    [get_ips axi_crossbar_0]
+generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_0/axi_crossbar_0.xci]
+
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
   create_fileset -constrset constrs_1
