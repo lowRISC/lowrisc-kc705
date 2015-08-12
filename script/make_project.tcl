@@ -36,6 +36,7 @@ set files [list \
                [file normalize $origin_dir/../../../fsim/generated-src/Top.$CONFIG.v] \
                [file normalize $origin_dir/../../../vsrc/chip_top.sv] \
                [file normalize $origin_dir/../../../vsrc/axi_bram_ctrl_top.sv] \
+               [file normalize $origin_dir/../../../vsrc/axi_crossbar_top.sv] \
                [file normalize $origin_dir/../../../socip/nasti/channel.sv] \
               ]
 add_files -norecurse -fileset [get_filesets sources_1] $files
@@ -72,23 +73,6 @@ set_property -dict [list \
                        ] [get_ips axi_bram_ctrl_0]
 generate_target {instantiation_template} \
     [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_bram_ctrl_0/axi_bram_ctrl_0.xci]
-
-#MMCM Clock Controller
-create_ip -name clk_wiz -vendor xilinx.com -library ip -version 5.1 -module_name clk_wiz_0
-set_property -dict [list \
-                        CONFIG.CLK_IN1_BOARD_INTERFACE {sys_diff_clock} \
-                        CONFIG.RESET_BOARD_INTERFACE {Custom} \
-                        CONFIG.USE_LOCKED {true} \
-                        CONFIG.PRIM_SOURCE {Differential_clock_capable_pin} \
-                        CONFIG.PRIM_IN_FREQ {200} \
-                        CONFIG.CLKIN1_JITTER_PS {50.0} \
-                        CONFIG.MMCM_CLKFBOUT_MULT_F {5.000} \
-                        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {50.000} \
-                        CONFIG.MMCM_CLKOUT0_DIVIDE_F {20.000} \
-                        CONFIG.MMCM_CLKIN1_PERIOD {5.0} ] \
-    [get_ips clk_wiz_0]
-generate_target {instantiation_template} \
-    [get_files $proj_dir/$project_name.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci]
 
 # Memory Controller
 create_ip -name mig_7series -vendor xilinx.com -library ip -version 2.3 -module_name mig_7series_0
@@ -131,6 +115,9 @@ set obj [get_filesets constrs_1]
 set file "[file normalize "$origin_dir/constraint/pin_plan.xdc"]"
 set file_added [add_files -norecurse -fileset $obj $file]
 
+# Import boot memory (Not Ideal)
+import_files [file normalize $origin_dir/src/boot.mem]
+
 
 # Create 'sim_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sim_1] ""]} {
@@ -141,7 +128,6 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 set obj [get_filesets sim_1]
 set files [list \
                [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
-               [file normalize $origin_dir/src/boot.mem] \
               ]
 add_files -norecurse -fileset $obj $files
 

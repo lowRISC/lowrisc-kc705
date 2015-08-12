@@ -38,6 +38,9 @@ $(simulation): $(verilog_lowrisc) $(verilog_srcs) | $(project)
 sim-run: | $(simulation)
 	cd $(project_name)/$(project_name).sim; xsim -g $(project_name)-behav-vcd &
 
+bootmem: ./src/boot.mem | $(project)
+	cp $< $(project_name)/$(project_name).srcs/sources_1/imports/src/boot.mem
+
 #---------- Source files ---------
 rocket: $(verilog_lowrisc)
 $(verilog_lowrisc):
@@ -50,4 +53,4 @@ clean:
 cleanall: clean
 	rm -fr $(project_name)
 
-.PHONY: vivado bitstream simulation sim-run rocket clean cleanall
+.PHONY: vivado bitstream simulation sim-run bootmem rocket clean cleanall
