@@ -20,7 +20,8 @@ default: project
 project = $(project_name)/$(project_name).xpr
 project: $(project)
 $(project): | $(verilog_lowrisc)
-	$(VIVADO) -mode batch -source script/make_project.tcl -tclargs $(project_name) $(CONFIG)
+	$(VIVADO) -mode batch -source script/make_project.tcl -tclargs $(project_name) $(CONFIG);
+	ln -s $(base_dir)/src/boot.mem $(project_name)/$(project_name).runs/synth_1/boot.mem
 
 vivado: $(project)
 	$(VIVADO) $(project) &
@@ -37,9 +38,6 @@ $(simulation): $(verilog_lowrisc) $(verilog_srcs) | $(project)
 
 sim-run: | $(simulation)
 	cd $(project_name)/$(project_name).sim; xsim -g $(project_name)-behav-vcd &
-
-bootmem: ./src/boot.mem | $(project)
-	cp $< $(project_name)/$(project_name).srcs/sources_1/imports/src/boot.mem
 
 #---------- Source files ---------
 rocket: $(verilog_lowrisc)

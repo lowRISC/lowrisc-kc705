@@ -115,8 +115,11 @@ set obj [get_filesets constrs_1]
 set file "[file normalize "$origin_dir/constraint/pin_plan.xdc"]"
 set file_added [add_files -norecurse -fileset $obj $file]
 
-# Import boot memory (Not Ideal)
-import_files [file normalize $origin_dir/src/boot.mem]
+# generate all IP source code
+generate_target all [get_ips]
+
+# force create the synth_1 path (need to make soft link in Makefile)
+launch_runs -scripts_only synth_1
 
 
 # Create 'sim_1' fileset (if not found)
@@ -160,8 +163,5 @@ set_msg_config -id "\[Netlist 29-345\]" -suppress
 
 # do not flatten design
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
-
-# generate all IP source code
-generate_target -quiet all [get_ips]
 
 
