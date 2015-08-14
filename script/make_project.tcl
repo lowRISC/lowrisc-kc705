@@ -84,8 +84,8 @@ generate_target {instantiation_template} \
 create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name axi_crossbar_0
 set_property -dict [list \
                         CONFIG.STRATEGY {2} \
-                        CONFIG.DATA_WIDTH {128} \
-                        CONFIG.ID_WIDTH {8} \
+                        CONFIG.DATA_WIDTH $mem_data_width \
+                        CONFIG.ID_WIDTH $axi_id_width \
                         CONFIG.S00_WRITE_ACCEPTANCE {2} \
                         CONFIG.S00_READ_ACCEPTANCE {2} \
                         CONFIG.M00_WRITE_ISSUING {1} \
@@ -102,6 +102,18 @@ set_property -dict [list \
                         CONFIG.S01_BASE_ID {0x00000100} ] \
     [get_ips axi_crossbar_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_0/axi_crossbar_0.xci]
+
+# AXI clock converter due to the clock difference
+create_ip -name axi_clock_converter -vendor xilinx.com -library ip -version 2.1 -module_name axi_clock_converter_0
+set_property -dict [list \
+                        CONFIG.ADDR_WIDTH {30} \
+                        CONFIG.DATA_WIDTH $mem_data_width \
+                        CONFIG.ID_WIDTH $axi_id_width \
+                        CONFIG.ACLK_ASYNC {0} \
+                        CONFIG.ACLK_RATIO {1:4}] \
+    [get_ips axi_clock_converter_0]
+generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_clock_converter_0/axi_clock_converter_0.xci]
+
 
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
