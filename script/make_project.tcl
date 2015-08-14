@@ -152,7 +152,7 @@ set_property include_dirs [list \
                                [file normalize $origin_dir/../../../fsim/generated-src] \
                               ] [get_filesets sim_1]
 set_property verilog_define [list \
-                                 SIMULATION \
+                                 FPGA \
                                 ] [get_filesets sim_1]
 
 set_property "tb" "tb" $obj

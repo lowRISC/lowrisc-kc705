@@ -34,7 +34,7 @@ $(bitstream): $(verilog_lowrisc) $(verilog_srcs) | $(project)
 simulation = $(project_name)/$(project_name).sim/xsim.dir/$(project_name)-behav-vcd
 simulation: $(simulation)
 $(simulation): $(verilog_lowrisc) $(verilog_srcs) | $(project)
-	./script/make_simulation.sh
+	source ./script/make_simulation.sh
 
 sim-run: | $(simulation)
 	cd $(project_name)/$(project_name).sim; xsim -g $(project_name)-behav-vcd &
