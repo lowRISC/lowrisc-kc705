@@ -157,6 +157,9 @@ set_property verilog_define [list \
 
 set_property "tb" "tb" $obj
 
+# force create the sim_1/behav path (need to make soft link in Makefile)
+launch_simulation -scripts_only
+
 # suppress some not very useful messages
 # warning partial connection
 set_msg_config -id "\[Synth 8-350\]" -suppress

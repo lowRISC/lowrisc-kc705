@@ -22,6 +22,7 @@ project: $(project)
 $(project): | $(verilog_lowrisc)
 	$(VIVADO) -mode batch -source script/make_project.tcl -tclargs $(project_name) $(CONFIG);
 	ln -s $(base_dir)/src/boot.mem $(project_name)/$(project_name).runs/synth_1/boot.mem
+	ln -s $(base_dir)/src/boot.mem $(project_name)/$(project_name).sim/sim_1/behav/boot.mem
 
 vivado: $(project)
 	$(VIVADO) $(project) &
@@ -31,13 +32,25 @@ bitstream: $(bitstream)
 $(bitstream): $(verilog_lowrisc) $(verilog_srcs) | $(project)
 	$(VIVADO) -mode batch -source ../../common/script/make_bitstream.tcl -tclargs $(project_name)
 
-simulation = $(project_name)/$(project_name).sim/xsim.dir/$(project_name)-behav-vcd
-simulation: $(simulation)
-$(simulation): $(verilog_lowrisc) $(verilog_srcs) | $(project)
-	source ./script/make_simulation.sh
+#simulation = $(project_name)/$(project_name).sim/xsim.dir/$(project_name)-behav-vcd
+#simulation: $(simulation)
+#$(simulation): $(verilog_lowrisc) $(verilog_srcs) | $(project)
+#	source ./script/make_simulation.sh
 
-sim-run: | $(simulation)
-	cd $(project_name)/$(project_name).sim; xsim -g $(project_name)-behav-vcd &
+#sim-run: | $(simulation)
+#	cd $(project_name)/$(project_name).sim; xsim -g $(project_name)-behav-vcd &
+
+sim-comp = $(project_name)/$(project_name).sim/sim_1/behav/compile.log
+sim-comp: $(sim-comp)
+$(sim-comp): $(verilog_lowrisc) $(verilog_srcs) | $(project)
+	cd $(project_name)/$(project_name).sim/sim_1/behav
+	source compile.sh
+
+sim-elab = $(project_name)/$(project_name).sim/sim_1/behav/elaborate.log
+sim-elab: $(sim-elab)
+$(sim-elab): $(sim-comp)
+	cd $(project_name)/$(project_name).sim/sim_1/behav
+	source elaborate.sh
 
 #---------- Source files ---------
 rocket: $(verilog_lowrisc)
