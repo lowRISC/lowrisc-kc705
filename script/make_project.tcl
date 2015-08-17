@@ -143,6 +143,7 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 set obj [get_filesets sim_1]
 set files [list \
                [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
+               [file normalize $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0/example_design/sim/ddr3_model.v] \
               ]
 add_files -norecurse -fileset $obj $files
 
@@ -150,12 +151,13 @@ add_files -norecurse -fileset $obj $files
 set_property include_dirs [list \
                                [file normalize $origin_dir/src] \
                                [file normalize $origin_dir/../../../fsim/generated-src] \
+                               [file normalize $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0/example_design/sim] \
                               ] [get_filesets sim_1]
 set_property verilog_define [list \
                                  FPGA \
                                 ] [get_filesets sim_1]
 
-set_property "tb" "tb" $obj
+set_property "top" "tb" $obj
 
 # force create the sim_1/behav path (need to make soft link in Makefile)
 launch_simulation -scripts_only
