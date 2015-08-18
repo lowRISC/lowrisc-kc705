@@ -4,4 +4,7 @@
 lowrisc-chip-imp
 src/boot.mem
 vivado_pid*
+*~
+DVEfiles
+.nodeIdDynamicRanges
 
