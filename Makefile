@@ -57,6 +57,14 @@ rocket: $(verilog_lowrisc)
 $(verilog_lowrisc):
 	cd ../../../fsim; make verilog CONFIG=$(CONFIG)
 
+#---------- Replace boot ram in bitstream -------#
+search-ramb:
+	$(VIVADO) -mode batch -source ../../common/script/search_ramb.tcl -tclargs $(project_name)
+
+bit-update: $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
+$(project_name)/$(project_name).runs/impl_1/chip_top.new.bit: src/boot.mem
+	data2mem -bm src/boot.bmm -bd $< -bt $(bitstream) -o b $@
+
 #---------- Other ----------------------
 clean:
 	rm -f *.log *.jou
@@ -64,4 +72,4 @@ clean:
 cleanall: clean
 	rm -fr $(project_name)
 
-.PHONY: vivado bitstream simulation sim-run bootmem rocket clean cleanall
+.PHONY: vivado bitstream simulation sim-run bootmem search-ramb endian-convert bit-update rocket clean cleanall
