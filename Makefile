@@ -14,6 +14,8 @@ verilog_srcs = \
 	../../../socip/nasti/channel.sv \
 	src/config.vh \
 
+boot_mem = src/boot.mem
+
 testbench_srcs = \
 	../../../vsrc/chip_top_tb.sv \
 
@@ -32,16 +34,8 @@ vivado: $(project)
 
 bitstream = $(project_name)/$(project_name).runs/impl_1/chip_top.bit
 bitstream: $(bitstream)
-$(bitstream): $(verilog_lowrisc) $(verilog_srcs) | $(project)
+$(bitstream): $(verilog_lowrisc) $(verilog_srcs) $(boot_mem) | $(project)
 	$(VIVADO) -mode batch -source ../../common/script/make_bitstream.tcl -tclargs $(project_name)
-
-#simulation = $(project_name)/$(project_name).sim/xsim.dir/$(project_name)-behav-vcd
-#simulation: $(simulation)
-#$(simulation): $(verilog_lowrisc) $(verilog_srcs) | $(project)
-#	source ./script/make_simulation.sh
-
-#sim-run: | $(simulation)
-#	cd $(project_name)/$(project_name).sim; xsim -g $(project_name)-behav-vcd &
 
 sim-comp = $(project_name)/$(project_name).sim/sim_1/behav/compile.log
 sim-comp: $(sim-comp)

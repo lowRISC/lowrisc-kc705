@@ -2,7 +2,6 @@
 *.log
 *.str
 lowrisc-chip-imp
-src/boot.mem
 vivado_pid*
 *~
 DVEfiles
