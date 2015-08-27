@@ -26,20 +26,20 @@ int main() {
   printf("DRAM test program.\n");
 
   while(1) {
-    printf("Write block @%x using key %llx\n", waddr, wkey);
+    printf("Write block @%lx using key %llx\n", waddr, wkey);
     for(i=0; i<1024; i++) {
       *(get_ddr_base() + waddr) = wkey;
-      waddr = (waddr + 1) % 1024;
+      waddr = (waddr + 1) % (1024*1024);
       wkey = lfsr64(wkey);
     }
 
-    if(waddr == raddr + 2048) {
-      printf("Check block @%x using key %llx\n", raddr, rkey);
+    if(waddr == raddr + 16*1024) { /* read after write 128K, force write back in L2 */
+      printf("Check block @%lx using key %llx\n", raddr, rkey);
       for(i=0; i<1024; i++) {
         unsigned long long rd = *(get_ddr_base() + raddr);
-        raddr = (raddr + 1) % 1024;
+        raddr = (raddr + 1) % (1024*1024);
         if(rkey != rd) {
-        printf("Error! key %llx stored @%x does not match with %llx\n", rd, raddr, rkey);
+        printf("Error! key %llx stored @%lx does not match with %llx\n", rd, raddr, rkey);
         return 1;
         }
         rkey = lfsr64(rkey);
