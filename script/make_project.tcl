@@ -33,7 +33,7 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 
 # Set 'sources_1' fileset object
 set files [list \
-               [file normalize $origin_dir/../../../fsim/generated-src/Top.$CONFIG.v] \
+               [file normalize $origin_dir/generated-src/Top.$CONFIG.v] \
                [file normalize $origin_dir/../../../vsrc/chip_top.sv] \
                [file normalize $origin_dir/../../../vsrc/axi_bram_ctrl_top.sv] \
                [file normalize $origin_dir/../../../vsrc/axi_crossbar_top.sv] \
@@ -44,8 +44,10 @@ add_files -norecurse -fileset [get_filesets sources_1] $files
 # add include path
 set_property include_dirs [list \
                                [file normalize $origin_dir/src ]\
-                               [file normalize $origin_dir/../../../fsim/generated-src] \
+                               [file normalize $origin_dir/generated-src] \
                               ] [get_filesets sources_1]
+
+set_property verilog_define FPGA [get_filesets sources_1]
 
 # Set 'sources_1' fileset properties
 set_property "top" "chip_top" [get_filesets sources_1]
@@ -150,7 +152,7 @@ add_files -norecurse -fileset $obj $files
 # add include path
 set_property include_dirs [list \
                                [file normalize $origin_dir/src] \
-                               [file normalize $origin_dir/../../../fsim/generated-src] \
+                               [file normalize $origin_dir/generated-src] \
                                [file normalize $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0/example_design/sim] \
                               ] [get_filesets sim_1]
 set_property verilog_define [list \
