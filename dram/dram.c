@@ -27,20 +27,20 @@ int main() {
 
   while(1) {
     printf("Write block @%lx using key %llx\n", waddr, wkey);
-    for(i=0; i<1024; i++) {
+    for(i=0; i<1024*16; i++) {
       *(get_ddr_base() + waddr) = wkey;
-      waddr = (waddr + 1) % (1024*1024);
+      waddr = (waddr + 1) & 0x3ffffff;
       wkey = lfsr64(wkey);
     }
 
-    if(waddr == raddr + 16*1024) { /* read after write 128K, force write back in L2 */
+    if(waddr == (raddr + 16*1024*16) & 0x3ffffff) { /* read after write 1M, force write back in L2 */
       printf("Check block @%lx using key %llx\n", raddr, rkey);
-      for(i=0; i<1024; i++) {
+      for(i=0; i<1024*16; i++) {
         unsigned long long rd = *(get_ddr_base() + raddr);
-        raddr = (raddr + 1) % (1024*1024);
+        raddr = (raddr + 1) & 0x3ffffff;
         if(rkey != rd) {
-        printf("Error! key %llx stored @%lx does not match with %llx\n", rd, raddr, rkey);
-        return 1;
+          printf("Error! key %llx stored @%lx does not match with %llx\n", rd, raddr, rkey);
+          return 1;
         }
         rkey = lfsr64(rkey);
       }
