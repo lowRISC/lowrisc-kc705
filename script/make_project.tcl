@@ -83,7 +83,7 @@ generate_target {instantiation_template} \
     [get_files $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0.xci]
 
 # AXI Crossbar
-create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name axi_crossbar_0
+create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name axi_crossbar_mem
 set_property -dict [list \
                         CONFIG.STRATEGY {2} \
                         CONFIG.DATA_WIDTH $mem_data_width \
@@ -102,8 +102,8 @@ set_property -dict [list \
                         CONFIG.S01_WRITE_ACCEPTANCE {4} \
                         CONFIG.S01_READ_ACCEPTANCE {4} \
                         CONFIG.S01_BASE_ID {0x00000100} ] \
-    [get_ips axi_crossbar_0]
-generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_0/axi_crossbar_0.xci]
+    [get_ips axi_crossbar_mem]
+generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_mem/axi_crossbar_mem.xci]
 
 # AXI clock converter due to the clock difference
 create_ip -name axi_clock_converter -vendor xilinx.com -library ip -version 2.1 -module_name axi_clock_converter_0
@@ -116,6 +116,28 @@ set_property -dict [list \
     [get_ips axi_clock_converter_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_clock_converter_0/axi_clock_converter_0.xci]
 
+# SPI interface for R/W SD card
+create_ip -name axi_quad_spi -vendor xilinx.com -library ip -version 3.2 -module_name axi_quad_spi_0
+set_property -dict [list \
+                        CONFIG.C_SCK_RATIO {4}] \
+    [get_ips axi_quad_spi_0]
+generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_quad_spi_0/axi_quad_spi_0.xci]
+
+# crossbar for IO space (AXI-Lite)
+create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name axi_crossbar_io
+set_property -dict [list \
+                        CONFIG.PROTOCOL {AXI4LITE} \
+                        CONFIG.CONNECTIVITY_MODE {SASD} \
+                        CONFIG.R_REGISTER {1} \
+                        CONFIG.S00_WRITE_ACCEPTANCE {1} \
+                        CONFIG.S00_READ_ACCEPTANCE {1} \
+                        CONFIG.M00_WRITE_ISSUING {1} \
+                        CONFIG.M01_WRITE_ISSUING {1} \
+                        CONFIG.M00_READ_ISSUING {1} \
+                        CONFIG.M01_READ_ISSUING {1} \
+                        CONFIG.S00_SINGLE_THREAD {1}] \
+    [get_ips axi_crossbar_io]
+generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_io/axi_crossbar_io.xci]
 
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
