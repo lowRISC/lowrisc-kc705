@@ -119,6 +119,7 @@ generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs
 # SPI interface for R/W SD card
 create_ip -name axi_quad_spi -vendor xilinx.com -library ip -version 3.2 -module_name axi_quad_spi_0
 set_property -dict [list \
+                        CONFIG.C_USE_STARTUP {0} \
                         CONFIG.C_SCK_RATIO {4}] \
     [get_ips axi_quad_spi_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_quad_spi_0/axi_quad_spi_0.xci]
