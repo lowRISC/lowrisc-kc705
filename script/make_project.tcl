@@ -128,6 +128,7 @@ generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs
 create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name axi_crossbar_io
 set_property -dict [list \
                         CONFIG.PROTOCOL {AXI4LITE} \
+                        CONFIG.ADDR_WIDTH {28} \
                         CONFIG.CONNECTIVITY_MODE {SASD} \
                         CONFIG.R_REGISTER {1} \
                         CONFIG.S00_WRITE_ACCEPTANCE {1} \
@@ -136,6 +137,8 @@ set_property -dict [list \
                         CONFIG.M01_WRITE_ISSUING {1} \
                         CONFIG.M00_READ_ISSUING {1} \
                         CONFIG.M01_READ_ISSUING {1} \
+                        CONFIG.M00_A00_ADDR_WIDTH {16} \
+                        CONFIG.M01_A00_ADDR_WIDTH {16} \
                         CONFIG.S00_SINGLE_THREAD {1}] \
     [get_ips axi_crossbar_io]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_io/axi_crossbar_io.xci]

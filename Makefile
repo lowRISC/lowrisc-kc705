@@ -26,7 +26,7 @@ include $(base_dir)/Makefrag
 #--------------------------------------------------------------------
 
 verilog_lowrisc = \
-	$(generated_dir)/Top.$(CONFIG).v \
+	$(generated_dir)/$(MODEL).$(CONFIG).v \
 	$(generated_dir)/consts.$(CONFIG).vh \
 
 verilog_srcs = \
