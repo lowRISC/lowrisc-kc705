@@ -7,6 +7,7 @@
 default: project
 
 base_dir = $(abspath ../../..)
+proj_dir = $(abspath .)
 mem_gen = $(base_dir)/fpga/common/fpga_mem_gen
 generated_dir = $(abspath ./generated-src)
 
@@ -69,8 +70,8 @@ project = $(project_name)/$(project_name).xpr
 project: $(project)
 $(project): | $(verilog_lowrisc)
 	$(VIVADO) -mode batch -source script/make_project.tcl -tclargs $(project_name) $(CONFIG)
-	ln -s $(base_dir)/src/boot.mem $(project_name)/$(project_name).runs/synth_1/boot.mem
-	ln -s $(base_dir)/src/boot.mem $(project_name)/$(project_name).sim/sim_1/behav/boot.mem
+	ln -s $(proj_dir)/src/boot.mem $(project_name)/$(project_name).runs/synth_1/boot.mem
+	ln -s $(proj_dir)/src/boot.mem $(project_name)/$(project_name).sim/sim_1/behav/boot.mem
 
 vivado: $(project)
 	$(VIVADO) $(project) &
@@ -93,7 +94,7 @@ $(sim-elab): $(sim-comp)
 	@echo "If error, see $(project_name)/$(project_name).sim/sim_1/behav/elaborate.log for more details."
 
 simulation: $(sim-elab)
-	cd $(project_name)/$(project_name).sim/sim_1/behav; xsim tb_behav -key {Behavioral:sim_1:Functional:tb} -tclbatch $(base_dir)/script/simulate.tcl -log $(base_dir)/simulate.log
+	cd $(project_name)/$(project_name).sim/sim_1/behav; xsim tb_behav -key {Behavioral:sim_1:Functional:tb} -tclbatch $(proj_dir)/script/simulate.tcl -log $(proj_dir)/simulate.log
 
 .PHONY: project vivado bitstream sim-comp sim-elab simulation
 
