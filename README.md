@@ -5,40 +5,38 @@ lowRISC Xilinx KC705 Board Developement Demo
 
 Requirement:
 
-  Vivado 2014.4
-  
-  lowRISC develope environment
+  **Vivado 2014.4** and **lowRISC develope environment**
 
 How to run the demo:
 --------------------------------------------------------
 
 * Generate bit-stream for downloading
 
-	make bitstream
+        make bitstream
 
 * Run FPGA simulation (extremely slow due to the DDR3 memory controller)
 
-	make simulation
+        make simulation
 
 * Open the Vivado GUI
 
-	make vivado
+        make vivado
 
 Other Make targets
 --------------------------------------------------------
 
 * Generate the FPGA backend Verilog files
 
-	make verilog
+        make verilog
 
 * Generate the Vivado project
 
-	make project
+        make project
 
 * Find out the boot BRAMs' name and position (for updating src/boot.bmm)
 
-	make search-ramb
+        make search-ramb
 
 * Replace the content of boot BRAM with a new src/boot.mem (must update src/boot.bmm first)
 
-	make bit-update
+        make bit-update
