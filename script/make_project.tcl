@@ -120,7 +120,8 @@ generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs
 create_ip -name axi_quad_spi -vendor xilinx.com -library ip -version 3.2 -module_name axi_quad_spi_0
 set_property -dict [list \
                         CONFIG.C_USE_STARTUP {0} \
-                        CONFIG.C_SCK_RATIO {4}] \
+                        CONFIG.C_SCK_RATIO {4} \
+                        CONFIG.C_NUM_TRANSFER_BITS {16}] \
     [get_ips axi_quad_spi_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_quad_spi_0/axi_quad_spi_0.xci]
 
@@ -130,7 +131,7 @@ set_property -dict [list \
                         CONFIG.PROTOCOL {AXI4LITE} \
                         CONFIG.ADDR_WIDTH {28} \
                         CONFIG.CONNECTIVITY_MODE {SASD} \
-                        CONFIG.R_REGISTER {1} \
+                        CONFIG.R_REGISTER {0} \
                         CONFIG.S00_WRITE_ACCEPTANCE {1} \
                         CONFIG.S00_READ_ACCEPTANCE {1} \
                         CONFIG.M00_WRITE_ISSUING {1} \
@@ -138,6 +139,7 @@ set_property -dict [list \
                         CONFIG.M00_READ_ISSUING {1} \
                         CONFIG.M01_READ_ISSUING {1} \
                         CONFIG.M00_A00_ADDR_WIDTH {16} \
+                        CONFIG.M01_A00_BASE_ADDR {0x0000000000010000} \
                         CONFIG.M01_A00_ADDR_WIDTH {16} \
                         CONFIG.S00_SINGLE_THREAD {1}] \
     [get_ips axi_crossbar_io]
