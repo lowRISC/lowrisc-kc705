@@ -44,7 +44,7 @@
 // DLM: Divisor latch (most significant byte) register [Read/Write, LCR[7] == 1]
 #define UART_DLM 0x1u
 
-// initialize uart
+// UART APIs
 extern void uart_init();
 extern void uart_send(uint8_t);
 extern uint8_t uart_recv();
