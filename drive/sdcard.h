@@ -44,24 +44,29 @@
 // SPI APIs
 
 // initialize SD card
-extern int sd_init();
+extern uint32_t sd_init();
+
+// Define init return value
+#define SD_TYPE_MMC    0
+#define SD_TYPE_SD_V1  1
+#define SD_TYPE_SD_V2  2
+#define SD_TYPE_SD_HC  3
+
+#define SD_ERR_SPI      0x100
+#define SD_ERR_RST      0x101
+#define SD_ERR_VOLTAGE  0x102
+#define SD_ERR_TIMEOUT  0x103
+
+// wait for maximal 500ms for SD to initialize
+#define SD_INIT_MAX_CYCLE 250000
 
 // send SD command (using SPI mode)
-extern uint64_t sd_send_cmd(uint8_t cmd, uint32_t arg, uint8_t crc7);
-
-// get response
-extern uint64_t sd_get_resp();
-
-// give slave enough clock to boot
-extern void spi_boot();
+extern uint32_t sd_send_cmd(uint8_t cmd, uint32_t arg, uint8_t crc7);
 
 // enable slave communication (cs -> low)
 extern void spi_slave_enable();
 
 // disable slave communication (cs -> high)
 extern void spi_slave_disable();
-
-// dump recv
-extern void spi_dump_recv();
 
 #endif

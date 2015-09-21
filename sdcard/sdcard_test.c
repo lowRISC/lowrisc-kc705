@@ -5,26 +5,12 @@
 #include "uart.h"
 
 int main() {
-  uint64_t resp;
+  uint32_t card_type;
 
   uart_init();
-  sd_init();
+  card_type = sd_init();
 
-  printf("boot\n", resp);
-  sd_send_cmd(0,0,0x4A); // CMD0
-  printf("CMD0\n", resp);
-  resp = sd_get_resp();
-  printf("%llx\n", resp);
-  resp = sd_get_resp();
-  printf("%llx\n", resp);
-
-  sd_send_cmd(0,0,0x4A); // CMD0
-  printf("CMD0\n", resp);
-  resp = sd_get_resp();
-  printf("%llx\n", resp);
-
-  resp = sd_get_resp();
-  printf("%llx\n", resp);
+  printf("sd card type = %0x\n", card_type);
 
   return 0;
 }
