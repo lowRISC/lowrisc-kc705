@@ -1,3 +1,5 @@
+// See LICENSE for license details.
+
 #ifndef DEVICE_MAP_H
 #define DEVICE_MAP_H
 

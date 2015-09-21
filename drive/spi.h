@@ -1,3 +1,5 @@
+// See LICENSE for license details.
+
 #ifndef SD_CARD_HEADER_H
 #define SD_CARD_HEADER_H
 
@@ -41,32 +43,28 @@
 // Receive FIFO occupancy register [Read]
 #define SPI_RFROR 0x1Eu
 
+/////////////////////////////
 // SPI APIs
 
-// initialize SD card
-extern uint32_t sd_init();
+// start spi
+void spi_init();
 
-// Define init return value
-#define SD_TYPE_MMC    0
-#define SD_TYPE_SD_V1  1
-#define SD_TYPE_SD_V2  2
-#define SD_TYPE_SD_HC  3
+// disable spi
+void spi_disable();
 
-#define SD_ERR_SPI      0x100
-#define SD_ERR_RST      0x101
-#define SD_ERR_VOLTAGE  0x102
-#define SD_ERR_TIMEOUT  0x103
+// send a byte
+uint8_t spi_send(uint8_t dat);
 
-// wait for maximal 500ms for SD to initialize
-#define SD_INIT_MAX_CYCLE 250000
+// send multiple byte, n<=16
+void spi_send_multi(uint8_t* dat, uint8_t n);
 
-// send SD command (using SPI mode)
-extern uint32_t sd_send_cmd(uint8_t cmd, uint32_t arg, uint8_t crc7);
+// recv multiple byte, n<=16
+void spi_recv_multi(uint8_t* dat, uint8_t n);
 
-// enable slave communication (cs -> low)
-extern void spi_slave_enable();
+// select slave device
+void spi_select_slave(uint8_t id);
 
-// disable slave communication (cs -> high)
-extern void spi_slave_disable();
+// deselect slave device
+void spi_deselect_slave(uint8_t id);
 
 #endif

@@ -1,3 +1,5 @@
+// See LICENSE for license details.
+
 #ifndef UART_HEADER_H
 #define UART_HEADER_H
 

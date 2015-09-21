@@ -1,3 +1,5 @@
+// See LICENSE for license details.
+
 #ifndef MEMORY_HEADER_H
 #define MEMORY_HEADER_H
 
