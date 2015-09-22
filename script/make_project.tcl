@@ -66,7 +66,7 @@ create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -version 4.0 -modul
 set_property -dict [list \
                         CONFIG.DATA_WIDTH $mem_data_width \
                         CONFIG.ID_WIDTH $axi_id_width \
-                        CONFIG.MEM_DEPTH {1024} \
+                        CONFIG.MEM_DEPTH {2048} \
                         CONFIG.PROTOCOL {AXI4} \
                         CONFIG.BMG_INSTANCE {EXTERNAL} \
                         CONFIG.SINGLE_PORT_BRAM {1} \
@@ -93,7 +93,7 @@ set_property -dict [list \
                         CONFIG.M00_WRITE_ISSUING {1} \
                         CONFIG.M01_WRITE_ISSUING {2} \
                         CONFIG.M00_READ_ISSUING {1} \
-                        CONFIG.M00_A00_ADDR_WIDTH {14} \
+                        CONFIG.M00_A00_ADDR_WIDTH {15} \
                         CONFIG.M01_READ_ISSUING {2} \
                         CONFIG.M01_A00_BASE_ADDR {0x0000000040000000} \
                         CONFIG.M01_A00_ADDR_WIDTH {30} \
@@ -121,7 +121,7 @@ create_ip -name axi_quad_spi -vendor xilinx.com -library ip -version 3.2 -module
 set_property -dict [list \
                         CONFIG.C_USE_STARTUP {0} \
                         CONFIG.C_SCK_RATIO {4} \
-                        CONFIG.C_NUM_TRANSFER_BITS {16}] \
+                        CONFIG.C_NUM_TRANSFER_BITS {8}] \
     [get_ips axi_quad_spi_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_quad_spi_0/axi_quad_spi_0.xci]
 

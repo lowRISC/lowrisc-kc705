@@ -1,9 +1,13 @@
-ADDRESS_SPACE BOOTRAM RAMB32 [0x00000000:0x00003FFF]
+ADDRESS_SPACE BOOTRAM RAMB32 [0x00000000:0x00007FFF]
   BUS_BLOCK
-    ram_reg_3 [127:96] LOC = X3Y18;  
-    ram_reg_2 [95:64]  LOC = X3Y15;  
-    ram_reg_1 [63:32]  LOC = X3Y17;  
-    ram_reg_0 [31:0]   LOC = X4Y15;
+    ram_reg_7 [127:112] LOC = X4Y13;
+    ram_reg_6 [111:96]  LOC = X4Y11;
+    ram_reg_5 [95:80]   LOC = X5Y8;
+    ram_reg_4 [79:64]   LOC = X4Y9;
+    ram_reg_3 [63:48]   LOC = X3Y13;
+    ram_reg_2 [47:32]   LOC = X4Y10;
+    ram_reg_1 [31:16]   LOC = X4Y8;
+    ram_reg_0 [15:0]    LOC = X4Y12;
   END_BUS_BLOCK;
 END_ADDRESS_SPACE;
 
