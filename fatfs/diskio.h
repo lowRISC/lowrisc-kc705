@@ -1,43 +1,41 @@
-/*-----------------------------------------------------------------------
-  /  Low level disk interface modlue include file   (C)ChaN, 2014
-  /-----------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
+/*  Low level disk interface modlue include file   (C)ChaN, 2014         */
 /*-----------------------------------------------------------------------*/
 /*
-  /  Copyright (C) 2014, ChaN, all right reserved.
-  /
-  / * This software is a free software and there is NO WARRANTY.
-  / * No restriction on use. You can use, modify and redistribute it for
-  /   personal, non-profit or commercial products UNDER YOUR RESPONSIBILITY.
-  / * Redistributions of source code must retain the above copyright notice.
-  /
-  /-------------------------------------------------------------------------*/
-/*-------------------------------------------------------------------------/
-  /* Copyright (c) 2015, University of Cambridge.
-  / All Rights Reserved.
-  / 
-  / Redistribution and use in source and binary forms, with or without
-  / modification, are permitted provided that the following conditions are met:
-  / 1. Redistributions of source code must retain the above copyright
-  /    notice, this list of conditions and the following disclaimer.
-  / 2. Redistributions in binary form must reproduce the above copyright
-  /    notice, this list of conditions and the following disclaimer in the
-  /    documentation and/or other materials provided with the distribution.
-  / 3. Neither the name of the University of Cambridge nor the
-  /    names of its contributors may be used to endorse or promote products
-  /    derived from this software without specific prior written permission.
-  / 
-  / IN NO EVENT SHALL UNIVERSITY OF CAMBRIDGE BE LIABLE TO ANY PARTY FOR DIRECT,
-  / INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
-  / ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS
-  / HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  / 
-  / UNIVERSITY OF CAMBRIDGE SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT
-  / NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-  / PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
-  / PROVIDED HEREUNDER IS PROVIDED "AS IS". UNIVERSITY OF CAMBRIDGE HAS NO
-  / OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
-  / MODIFICATIONS.
-  /------------------------------------------------------------------------*/
+ *  Copyright (C) 2014, ChaN, all right reserved.
+ *
+ * * This software is a free software and there is NO WARRANTY.
+ * * No restriction on use. You can use, modify and redistribute it for
+ *   personal, non-profit or commercial products UNDER YOUR RESPONSIBILITY.
+ * * Redistributions of source code must retain the above copyright notice.
+ *
+ * Copyright (c) 2015, University of Cambridge.
+ * All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University of Cambridge nor the
+ *    names of its contributors may be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * IN NO EVENT SHALL UNIVERSITY OF CAMBRIDGE BE LIABLE TO ANY PARTY FOR DIRECT,
+ * INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS
+ * HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * UNIVERSITY OF CAMBRIDGE SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
+ * PROVIDED HEREUNDER IS PROVIDED "AS IS". UNIVERSITY OF CAMBRIDGE HAS NO
+ * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+ * MODIFICATIONS.
+ */
+/*------------------------------------------------------------------------*/
 
 #ifndef _DISKIO_DEFINED
 #define _DISKIO_DEFINED
@@ -46,14 +44,13 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
 #define _USE_WRITE  1   /* 1: Enable disk_write function */
 #define _USE_IOCTL  1   /* 1: Enable disk_ioctl fucntion */
 
-#include "integer.h"
-
-
   /* Status of Disk Functions */
-  typedef BYTE    DSTATUS;
+  typedef uint8_t    DSTATUS;
 
   /* Results of Disk Functions */
   typedef enum {
@@ -69,14 +66,14 @@ extern "C" {
   /* Prototypes for disk control functions */
 
 
-  DSTATUS disk_initialize (BYTE pdrv);
-  DSTATUS disk_status (BYTE pdrv);
-  DRESULT disk_read (BYTE pdrv, BYTE* buff, DWORD sector, UINT count);
+  DSTATUS disk_initialize (uint8_t pdrv);
+  DSTATUS disk_status (uint8_t pdrv);
+  DRESULT disk_read (uint8_t pdrv, uint8_t* buff, uint32_t sector, uint32_t count);
 #if _USE_WRITE
-  DRESULT disk_write (BYTE pdrv, const BYTE* buff, DWORD sector, UINT count);
+  DRESULT disk_write (uint8_t pdrv, const uint8_t* buff, uint32_t sector, uint32_t count);
 #endif
 #if _USE_IOCTL
-  DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff);
+  DRESULT disk_ioctl (uint8_t pdrv, uint8_t cmd, void* buff);
 #endif
   void disk_timerproc (void);
 

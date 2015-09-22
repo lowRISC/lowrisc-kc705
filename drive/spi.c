@@ -1,10 +1,12 @@
 // See LICENSE for license details.
 
-#include "sdcard.h"
+#include "spi.h"
 
 volatile uint32_t *spi_base_ptr = (uint32_t *)(SPI_BASE);
 
 void spi_init() {
+  uint32_t resp;
+
   // software reset?
   *(spi_base_ptr + SPI_SRR) = 0xa;
 
@@ -16,9 +18,9 @@ void spi_init() {
   *(spi_base_ptr + SPI_GIER) = 0x0;
 
   // read status register
-  resp = (*(spi_base_ptr + SPI_SR)) & 0x7FF;
-  if(resp != 0x25)
-    return SD_ERR_SPI; // SPI error!
+  //resp = (*(spi_base_ptr + SPI_SR)) & 0x7FF;
+  //if(resp != 0x25)
+  //  return SD_ERR_SPI; // SPI error!
 
   // enable spi
   *(spi_base_ptr + SPI_CR) = 0x86;
@@ -35,10 +37,10 @@ uint8_t spi_send(uint8_t dat) {
   return *(spi_base_ptr + SPI_DRR);
 }
 
-void spi_send_multi(uint8_t* dat, uint8_t n) {
+void spi_send_multi(const uint8_t* dat, uint8_t n) {
   uint8_t i;
   for(i=0; i<n; i++)
-    *(spi_base_ptr + SPI_DTR) = dat++;
+    *(spi_base_ptr + SPI_DTR) = *(dat++);
   while(!GetBit(*(spi_base_ptr + SPI_SR), 2));
   // reset recv FIFO
   *(spi_base_ptr + SPI_CR) = 0xC6;
@@ -53,11 +55,11 @@ void spi_recv_multi(uint8_t* dat, uint8_t n) {
     *(dat++) = *(spi_base_ptr + SPI_DRR);
 }
 
-void spi_select_slave(uint8_t) {
+void spi_select_slave(uint8_t id) {
   *(spi_base_ptr + SPI_SSR) = 0xFFFFFFFE;
 }
 
-void spi_deselect_slave(uint8_t) {
+void spi_deselect_slave(uint8_t id) {
   *(spi_base_ptr + SPI_SSR) = 0xFFFFFFFF;
 }
 

@@ -56,7 +56,7 @@ void spi_disable();
 uint8_t spi_send(uint8_t dat);
 
 // send multiple byte, n<=16
-void spi_send_multi(uint8_t* dat, uint8_t n);
+void spi_send_multi(const uint8_t* dat, uint8_t n);
 
 // recv multiple byte, n<=16
 void spi_recv_multi(uint8_t* dat, uint8_t n);

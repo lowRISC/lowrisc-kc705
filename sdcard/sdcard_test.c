@@ -1,16 +1,17 @@
 // SD test program
 
 #include <stdio.h>
-#include "sdcard.h"
+#include "diskio.h"
+#include "ff.h"
 #include "uart.h"
 
 int main() {
-  uint32_t card_type;
+  DSTATUS s;
 
   uart_init();
-  card_type = sd_init();
+  s = disk_initialize(0);
 
-  printf("sd card type = %0x\n", card_type);
+  printf("disk status = %0x\n", s);
 
   return 0;
 }

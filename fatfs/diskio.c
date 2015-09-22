@@ -1,42 +1,41 @@
 /*-----------------------------------------------------------------------*/
-/* MMCv3/SDv1/SDv2 (in SPI mode) control module                          */
+/* MMCv3/SDv1/SDv2/SDHC (in SPI mode) control module                     */
 /*-----------------------------------------------------------------------*/
 /*
-  /  Copyright (C) 2014, ChaN, all right reserved.
-  /
-  / * This software is a free software and there is NO WARRANTY.
-  / * No restriction on use. You can use, modify and redistribute it for
-  /   personal, non-profit or commercial products UNDER YOUR RESPONSIBILITY.
-  / * Redistributions of source code must retain the above copyright notice.
-  /
-  /-------------------------------------------------------------------------*/
-/*-------------------------------------------------------------------------/
-  /* Copyright (c) 2015, University of Cambridge.
-  / All Rights Reserved.
-  / 
-  / Redistribution and use in source and binary forms, with or without
-  / modification, are permitted provided that the following conditions are met:
-  / 1. Redistributions of source code must retain the above copyright
-  /    notice, this list of conditions and the following disclaimer.
-  / 2. Redistributions in binary form must reproduce the above copyright
-  /    notice, this list of conditions and the following disclaimer in the
-  /    documentation and/or other materials provided with the distribution.
-  / 3. Neither the name of the University of Cambridge nor the
-  /    names of its contributors may be used to endorse or promote products
-  /    derived from this software without specific prior written permission.
-  / 
-  / IN NO EVENT SHALL UNIVERSITY OF CAMBRIDGE BE LIABLE TO ANY PARTY FOR DIRECT,
-  / INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
-  / ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS
-  / HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  / 
-  / UNIVERSITY OF CAMBRIDGE SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT
-  / NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-  / PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
-  / PROVIDED HEREUNDER IS PROVIDED "AS IS". UNIVERSITY OF CAMBRIDGE HAS NO
-  / OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
-  / MODIFICATIONS.
-  /------------------------------------------------------------------------*/
+ *  Copyright (C) 2014, ChaN, all right reserved.
+ *
+ * * This software is a free software and there is NO WARRANTY.
+ * * No restriction on use. You can use, modify and redistribute it for
+ *   personal, non-profit or commercial products UNDER YOUR RESPONSIBILITY.
+ * * Redistributions of source code must retain the above copyright notice.
+ *
+ * Copyright (c) 2015, University of Cambridge.
+ * All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University of Cambridge nor the
+ *    names of its contributors may be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * IN NO EVENT SHALL UNIVERSITY OF CAMBRIDGE BE LIABLE TO ANY PARTY FOR DIRECT,
+ * INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
+ * ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS
+ * HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * UNIVERSITY OF CAMBRIDGE SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
+ * PROVIDED HEREUNDER IS PROVIDED "AS IS". UNIVERSITY OF CAMBRIDGE HAS NO
+ * OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+ * MODIFICATIONS.
+ */
+/*------------------------------------------------------------------------*/
 
 #include "diskio.h"
 #include "spi.h"
@@ -73,11 +72,8 @@
 static volatile
 DSTATUS Stat = STA_NOINIT;  /* Disk status */
 
-static volatile
-BYTE Timer1, Timer2;    /* 100Hz decrement timer */
-
 static
-BYTE CardType;          /* Card type flags */
+uint8_t CardType;          /* Card type flags */
 
 
 /*-----------------------------------------------------------------------*/
@@ -106,9 +102,9 @@ void power_off (void)
 
 /* Exchange a byte */
 static
-BYTE xchg_spi (                /* Returns received data */
-               BYTE dat        /* Data to be sent */
-                               )
+uint8_t xchg_spi (                /* Returns received data */
+                  uint8_t dat     /* Data to be sent */
+                                  )
 {
   return spi_send(dat);
 }
@@ -116,8 +112,8 @@ BYTE xchg_spi (                /* Returns received data */
 /* Send a data block fast */
 static
 void xmit_spi_multi (
-                     const BYTE *p,  /* Data block to be sent */
-                     UINT cnt        /* Size of data block (must be multiple of 2) */
+                     const uint8_t *p,  /* Data block to be sent */
+                     uint32_t cnt       /* Size of data block (must be multiple of 2) */
                      )
 {
   int i = 0;
@@ -132,8 +128,8 @@ void xmit_spi_multi (
 /* Receive a data block fast */
 static
 void rcvr_spi_multi (
-                     BYTE *p,    /* Data buffer */
-                     UINT cnt    /* Size of data block (must be multiple of 2) */
+                     uint8_t *p,    /* Data buffer */
+                     uint32_t cnt   /* Size of data block (must be multiple of 2) */
                      )
 {
   int i = 0;
@@ -151,10 +147,10 @@ void rcvr_spi_multi (
 
 static
 int wait_ready (                /* 1:Ready, 0:Timeout */
-                UINT wt         /* Timeout [ms] */
+                uint32_t wt     /* Timeout [ms] */
                                 )
 {
-  BYTE d;
+  uint8_t d;
   uint32_t timeout = wt*5000;
 
   do {
@@ -197,11 +193,11 @@ int select (void)   /* 1:Successful, 0:Timeout */
 
 static
 int rcvr_datablock (
-                    BYTE *buff,         /* Data buffer to store received data */
-                    UINT btr            /* Byte count (must be multiple of 4) */
+                    uint8_t *buff,         /* Data buffer to store received data */
+                    uint32_t btr            /* Byte count (must be multiple of 4) */
                     )
 {
-  BYTE token;
+  uint8_t token;
 
   uint32_t timeout=200*5000;
   do {                            /* Wait for data packet in timeout of 200ms */
@@ -226,11 +222,11 @@ int rcvr_datablock (
 #if _USE_WRITE
 static
 int xmit_datablock (
-                    const BYTE *buff,   /* 512 byte data block to be transmitted */
-                    BYTE token          /* Data/Stop token */
+                    const uint8_t *buff,   /* 512 byte data block to be transmitted */
+                    uint8_t token          /* Data/Stop token */
                     )
 {
-  BYTE resp;
+  uint8_t resp;
 
 
   if (!wait_ready(500)) return 0;
@@ -256,12 +252,12 @@ int xmit_datablock (
 /*-----------------------------------------------------------------------*/
 
 static
-BYTE send_cmd (     /* Returns R1 resp (bit7==1:Send failed) */
-               BYTE cmd,       /* Command index */
-               DWORD arg       /* Argument */
-                    )
+uint8_t send_cmd (     /* Returns R1 resp (bit7==1:Send failed) */
+                  uint8_t cmd,       /* Command index */
+                  uint32_t arg       /* Argument */
+                       )
 {
-  BYTE n, res;
+  uint8_t n, res;
 
 
   if (cmd & 0x80) {   /* ACMD<n> is the command sequense of CMD55-CMD<n> */
@@ -278,17 +274,17 @@ BYTE send_cmd (     /* Returns R1 resp (bit7==1:Send failed) */
 
   /* Send command packet */
   xchg_spi(0x40 | cmd);               /* Start + Command index */
-  xchg_spi((BYTE)(arg >> 24));        /* Argument[31..24] */
-  xchg_spi((BYTE)(arg >> 16));        /* Argument[23..16] */
-  xchg_spi((BYTE)(arg >> 8));         /* Argument[15..8] */
-  xchg_spi((BYTE)arg);                /* Argument[7..0] */
+  xchg_spi((uint8_t)(arg >> 24));     /* Argument[31..24] */
+  xchg_spi((uint8_t)(arg >> 16));     /* Argument[23..16] */
+  xchg_spi((uint8_t)(arg >> 8));      /* Argument[15..8] */
+  xchg_spi((uint8_t)arg);             /* Argument[7..0] */
   n = 0x01;                           /* Dummy CRC + Stop */
   if (cmd == CMD0) n = 0x95;          /* Valid CRC for CMD0(0) + Stop */
   if (cmd == CMD8) n = 0x87;          /* Valid CRC for CMD8(0x1AA) Stop */
   xchg_spi(n);
 
   /* Receive command response */
-  if (cmd == CMD12) xchg_spi(0xFF);       /* Skip a stuff byte when stop reading */
+  if (cmd == CMD12) xchg_spi(0xFF);   /* Skip a stuff byte when stop reading */
   n = 10;                             /* Wait for a valid response in timeout of 10 attempts */
   do
     res = xchg_spi(0xFF);
@@ -311,48 +307,48 @@ BYTE send_cmd (     /* Returns R1 resp (bit7==1:Send failed) */
 /*-----------------------------------------------------------------------*/
 
 DSTATUS disk_initialize (
-                         BYTE pdrv       /* Physical drive nmuber (0) */
+                         uint8_t pdrv       /* Physical drive nmuber (0) */
                          )
 {
-  BYTE n, cmd, ty, ocr[4];
+  uint8_t n, cmd, ty, ocr[4];
+  uint32_t timeout;
 
 
   if (pdrv) return STA_NOINIT;        /* Supports only single drive */
   power_off();                        /* Turn off the socket power to reset the card */
   if (Stat & STA_NODISK) return Stat; /* No card in the socket */
   power_on();                         /* Turn on the socket power */
-  FCLK_SLOW();
-  for (n = 10; n; n--) xchg_spi(0xFF);    /* 80 dummy clocks */
+  for (n = 10; n; n--) xchg_spi(0xFF); /* 80 dummy clocks */
 
   ty = 0;
-  if (send_cmd(CMD0, 0) == 1) {           /* Enter Idle state */
-    timeout = 1000*1000;                       /* Initialization timeout of 1000 msec */
-    if (send_cmd(CMD8, 0x1AA) == 1) {   /* SDv2? */
-      for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF);        /* Get trailing return value of R7 resp */
-      if (ocr[2] == 0x01 && ocr[3] == 0xAA) {             /* The card can work at vdd range of 2.7-3.6V */
-        while (timeout-- && send_cmd(ACMD41, 1UL << 30));  /* Wait for leaving idle state (ACMD41 with HCS bit) */
-        if (timeout-- && send_cmd(CMD58, 0) == 0) {        /* Check CCS bit in the OCR */
+  if (send_cmd(CMD0, 0) == 1) {      /* Enter Idle state */
+    timeout = 1000*1000;             /* Initialization timeout of 1000 msec */
+    if (timeout-- && send_cmd(CMD8, 0x1AA) == 1) {   /* SDv2? */
+      for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF);  /* Get trailing return value of R7 resp */
+      if (ocr[2] == 0x01 && ocr[3] == 0xAA) {           /* The card can work at vdd range of 2.7-3.6V */
+        while (timeout-- && send_cmd(ACMD41, 1UL << 30)); /* Wait for leaving idle state (ACMD41 with HCS bit) */
+        if (timeout-- && send_cmd(CMD58, 0) == 0) {     /* Check CCS bit in the OCR */
           for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF);
-          ty = (ocr[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;  /* SDv2 */
+          ty = (ocr[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2; /* SDv2 */
         }
       }
-    } else {                            /* SDv1 or MMCv3 */
-      if (send_cmd(ACMD41, 0) <= 1)   {
+    } else {                        /* SDv1 or MMCv3 */
+      if (timeout-- && send_cmd(ACMD41, 0) <= 1)   {
         ty = CT_SD1; cmd = ACMD41;  /* SDv1 */
       } else {
         ty = CT_MMC; cmd = CMD1;    /* MMCv3 */
       }
-      while (timeout-- && send_cmd(cmd, 0));         /* Wait for leaving idle state */
-      if (!Timer1 || send_cmd(CMD16, 512) != 0)   /* Set R/W block length to 512 */
+      while (timeout-- && send_cmd(cmd, 0));      /* Wait for leaving idle state */
+      if (timeout-- || send_cmd(CMD16, 512) != 0)   /* Set R/W block length to 512 */
         ty = 0;
     }
   }
   CardType = ty;
   deselect();
 
-  if (ty) {           /* Initialization succeded */
-    Stat &= ~STA_NOINIT;        /* Clear STA_NOINIT */
-  } else {            /* Initialization failed */
+  if (ty) {              /* Initialization succeded */
+    Stat &= ~STA_NOINIT; /* Clear STA_NOINIT */
+  } else {               /* Initialization failed */
     power_off();
   }
 
@@ -366,7 +362,7 @@ DSTATUS disk_initialize (
 /*-----------------------------------------------------------------------*/
 
 DSTATUS disk_status (
-                     BYTE pdrv       /* Physical drive nmuber (0) */
+                     uint8_t pdrv       /* Physical drive nmuber (0) */
                      )
 {
   if (pdrv) return STA_NOINIT;    /* Supports only single drive */
@@ -380,13 +376,13 @@ DSTATUS disk_status (
 /*-----------------------------------------------------------------------*/
 
 DRESULT disk_read (
-                   BYTE pdrv,          /* Physical drive nmuber (0) */
-                   BYTE *buff,         /* Pointer to the data buffer to store read data */
-                   DWORD sector,       /* Start sector number (LBA) */
-                   UINT count          /* Sector count (1..128) */
+                   uint8_t pdrv,          /* Physical drive nmuber (0) */
+                   uint8_t *buff,         /* Pointer to the data buffer to store read data */
+                   uint32_t sector,       /* Start sector number (LBA) */
+                   uint32_t count          /* Sector count (1..128) */
                    )
 {
-  BYTE cmd;
+  uint8_t cmd;
 
 
   if (pdrv || !count) return RES_PARERR;
@@ -415,10 +411,10 @@ DRESULT disk_read (
 
 #if _USE_WRITE
 DRESULT disk_write (
-                    BYTE pdrv,          /* Physical drive nmuber (0) */
-                    const BYTE *buff,   /* Pointer to the data to be written */
-                    DWORD sector,       /* Start sector number (LBA) */
-                    UINT count          /* Sector count (1..128) */
+                    uint8_t pdrv,          /* Physical drive nmuber (0) */
+                    const uint8_t *buff,   /* Pointer to the data to be written */
+                    uint32_t sector,       /* Start sector number (LBA) */
+                    uint32_t count          /* Sector count (1..128) */
                     )
 {
   if (pdrv || !count) return RES_PARERR;
@@ -456,14 +452,14 @@ DRESULT disk_write (
 
 #if _USE_IOCTL
 DRESULT disk_ioctl (
-                    BYTE pdrv,      /* Physical drive nmuber (0) */
-                    BYTE cmd,       /* Control code */
+                    uint8_t pdrv,      /* Physical drive nmuber (0) */
+                    uint8_t cmd,       /* Control code */
                     void *buff      /* Buffer to send/receive control data */
                     )
 {
   DRESULT res;
-  BYTE n, csd[16], *ptr = buff;
-  DWORD csize;
+  uint8_t n, csd[16], *ptr = buff;
+  uint32_t csize;
 
 
   if (pdrv) return RES_PARERR;
@@ -477,36 +473,36 @@ DRESULT disk_ioctl (
     if (select()) res = RES_OK;
     break;
 
-  case GET_SECTOR_COUNT : /* Get number of sectors on the disk (DWORD) */
+  case GET_SECTOR_COUNT : /* Get number of sectors on the disk (uint32_t) */
     if ((send_cmd(CMD9, 0) == 0) && rcvr_datablock(csd, 16)) {
       if ((csd[0] >> 6) == 1) {   /* SDC ver 2.00 */
-        csize = csd[9] + ((WORD)csd[8] << 8) + ((DWORD)(csd[7] & 63) << 16) + 1;
-        *(DWORD*)buff = csize << 10;
+        csize = csd[9] + ((uint16_t)csd[8] << 8) + ((uint32_t)(csd[7] & 63) << 16) + 1;
+        *(uint32_t*)buff = csize << 10;
       } else {                    /* SDC ver 1.XX or MMC*/
         n = (csd[5] & 15) + ((csd[10] & 128) >> 7) + ((csd[9] & 3) << 1) + 2;
-        csize = (csd[8] >> 6) + ((WORD)csd[7] << 2) + ((WORD)(csd[6] & 3) << 10) + 1;
-        *(DWORD*)buff = csize << (n - 9);
+        csize = (csd[8] >> 6) + ((uint16_t)csd[7] << 2) + ((uint16_t)(csd[6] & 3) << 10) + 1;
+        *(uint32_t*)buff = csize << (n - 9);
       }
       res = RES_OK;
     }
     break;
 
-  case GET_BLOCK_SIZE :   /* Get erase block size in unit of sector (DWORD) */
+  case GET_BLOCK_SIZE :   /* Get erase block size in unit of sector (uint32_t) */
     if (CardType & CT_SD2) {    /* SDv2? */
       if (send_cmd(ACMD13, 0) == 0) { /* Read SD status */
         xchg_spi(0xFF);
         if (rcvr_datablock(csd, 16)) {              /* Read partial block */
           for (n = 64 - 16; n; n--) xchg_spi(0xFF);   /* Purge trailing data */
-          *(DWORD*)buff = 16UL << (csd[10] >> 4);
+          *(uint32_t*)buff = 16UL << (csd[10] >> 4);
           res = RES_OK;
         }
       }
     } else {                    /* SDv1 or MMCv3 */
       if ((send_cmd(CMD9, 0) == 0) && rcvr_datablock(csd, 16)) {  /* Read CSD */
         if (CardType & CT_SD1) {    /* SDv1 */
-          *(DWORD*)buff = (((csd[10] & 63) << 1) + ((WORD)(csd[11] & 128) >> 7) + 1) << ((csd[13] >> 6) - 1);
+          *(uint32_t*)buff = (((csd[10] & 63) << 1) + ((uint16_t)(csd[11] & 128) >> 7) + 1) << ((csd[13] >> 6) - 1);
         } else {                    /* MMCv3 */
-          *(DWORD*)buff = ((WORD)((csd[10] & 124) >> 2) + 1) * (((csd[11] & 3) << 3) + ((csd[11] & 224) >> 5) + 1);
+          *(uint32_t*)buff = ((uint16_t)((csd[10] & 124) >> 2) + 1) * (((csd[11] & 3) << 3) + ((csd[11] & 224) >> 5) + 1);
         }
         res = RES_OK;
       }
