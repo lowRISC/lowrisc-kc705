@@ -75,13 +75,14 @@ void tohost_exit(long code)
 {
   // halt
   if(code) {
-    uart_send('e');
-    uart_send('r');
-    uart_send('r');
-    uart_send('o');
-    uart_send('r');
-    uart_send('!');
-    uart_send('\n');
+    char str[] = "error! exit(0xFFFFFFFFFFFFFFFF)\n";
+    int i;
+    for (i = 0; i < 16; i++) {
+      str[29-i] = (code & 0xF) + ((code & 0xF) < 10 ? '0' : 'a'-10);
+      code >>= 4;
+    }
+    for(i=0; i<32; i++)
+      uart_send(str[i]);
   }    
   while (1);
 }
@@ -95,8 +96,22 @@ long handle_trap(long cause, long epc, long regs[32])
   if (cause == CAUSE_ILLEGAL_INSTRUCTION &&
       (*(int*)epc & *csr_insn) == *csr_insn)
     ;
-  else if (cause != CAUSE_USER_ECALL)
+  else if (cause != CAUSE_USER_ECALL) {
+    char str[] = "0xFFFFFFFFFFFFFFFF@0xFFFFFFFFFFFFFFFF\n";
+    int i;
+    for (i = 0; i < 16; i++) {
+      str[17-i] = (cause & 0xF) + ((cause & 0xF) < 10 ? '0' : 'a'-10);
+      cause >>= 4;
+    }
+    for (i = 0; i < 16; i++) {
+      str[36-i] = (epc & 0xF) + ((epc & 0xF) < 10 ? '0' : 'a'-10);
+      epc >>= 4;
+    }
+    for(i=0; i<38; i++)
+      uart_send(str[i]);
+
     tohost_exit(1337);
+  }
   else if (regs[17] == SYS_exit)
     tohost_exit(regs[10]);
   else if (regs[17] == SYS_stats)
