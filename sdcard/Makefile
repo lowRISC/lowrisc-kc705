@@ -46,7 +46,7 @@ ff.o: ../fatfs/ff.c ../fatfs/ff.h ../fatfs/ffconf.h ../fatfs/diskio.h ../drive/s
 	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
 sdcard_test.hex: sdcard_test
-	elf2hex 16 2048 $< > $@
+	elf2hex 16 4096 $< > $@
 
 sdcard_test.dump: sdcard_test
 	$(RISCV_DUMP) $(RISCV_DUMP_OPTS) $< > $@

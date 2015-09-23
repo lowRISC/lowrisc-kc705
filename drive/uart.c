@@ -24,10 +24,15 @@ void uart_init() {
 
 void uart_send(uint8_t data) {
   // wait until THR empty
-  uint32_t status;
-  while(! (*(uart_base_ptr + UART_LSR) & 0x40u)) { }
-
+  while(! (*(uart_base_ptr + UART_LSR) & 0x40u));
   *(uart_base_ptr + UART_THR) = data;
+}
+
+void uart_send_string(const uint8_t *str) {
+  while(*str != 0) {
+    while(! (*(uart_base_ptr + UART_LSR) & 0x40u));
+    *(uart_base_ptr + UART_THR) = *(str++);
+  }
 }
 
 uint8_t uart_recv() {

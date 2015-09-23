@@ -37,7 +37,7 @@ uart.o:../drive/uart.c ../drive/uart.h ../drive/device_map.h
 	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
 hello.hex: hello
-	elf2hex 16 2048 $< > $@
+	elf2hex 16 4096 $< > $@
 
 hello.dump: hello
 	$(RISCV_DUMP) $(RISCV_DUMP_OPTS) $< > $@

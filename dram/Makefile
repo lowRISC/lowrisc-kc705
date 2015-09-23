@@ -40,7 +40,7 @@ memory.o:../drive/memory.c ../drive/memory.h ../drive/device_map.h
 	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
 dram.hex: dram
-	elf2hex 16 1024 $< > $@
+	elf2hex 16 4096 $< > $@
 
 dram.dump: dram
 	$(RISCV_DUMP) $(RISCV_DUMP_OPTS) $< > $@
