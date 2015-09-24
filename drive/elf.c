@@ -54,7 +54,7 @@
 
 #include "elf.h"
 
-#include <stdint.h>
+#include <string.h>
 
 #define IS_ELF(hdr) \
   ((hdr).e_ident[0] == 0x7f && (hdr).e_ident[1] == 'E' && \
@@ -116,6 +116,32 @@ typedef struct {
   uint64_t st_size;
 } Elf64_Sym;
 
-void load_elf(uint8_t *target_base, const uint8_t elf) {
-  
+int load_elf(uint8_t *target_base, const uint8_t *elf, const uint32_t elf_size) {
+  // sanity checks
+  if(elf_size <= sizeof(Elf64_Ehdr))
+    return 1;                   /* too small */
+
+  const Elf64_Ehdr *eh = (const Elf64_Ehdr *)elf;
+  if(!IS_ELF64(*eh))
+    return 2;                   /* not a elf64 file */
+
+  const Elf64_Phdr *ph = (const Elf64_Phdr *)(elf + eh->e_phoff);
+  if(elf_size < eh->e_phoff + eh->e_phnum*sizeof(*ph))
+    return 3;                   /* internal damaged */
+
+  uint32_t i;
+  for(i=0; i<eh->e_phnum; i++) {
+    if(ph[i].p_type == PT_LOAD && ph[i].p_memsz) { /* need to load this physical section */
+      if(ph[i].p_filesz) {                         /* has data */
+        if(elf_size < ph[i].p_offset + ph[i].p_filesz)
+          return 3;             /* internal damaged */
+        memcpy(target_base + ph[i].p_paddr, elf + ph[i].p_offset, ph[i].p_filesz);
+      }
+      if(ph[i].p_memsz > ph[i].p_filesz) { /* zero padding */
+        memset(target_base + ph[i].p_paddr + ph[i].p_filesz, 0, ph[i].p_memsz - ph[i].p_filesz);
+      }
+    }
+  }
+
+  return 0;                     /* done */
 }

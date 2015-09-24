@@ -55,6 +55,8 @@
 #ifndef _ELF_H
 #define _ELF_H
 
-extern void load_elf(uint8_t *target_base, const uint8_t elf);
+#include <stdint.h>
+
+extern int load_elf(uint8_t *target_base, const uint8_t *elf, const uint32_t elf_size);
 
 #endif
