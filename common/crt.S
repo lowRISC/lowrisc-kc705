@@ -226,6 +226,30 @@ trap_entry:
   addi sp, sp, 272
   eret
 
+  .global asm_set_iobase
+asm_set_iobase:
+  csrw    0x7b0, a0
+  csrw    0x7b1, a1
+  csrw    0x7bf, a0
+  ret
+
+  .global asm_set_membase
+asm_set_membase:
+  csrw    0x7a0, a0
+  csrw    0x7a1, a1
+  csrw    0x7a2, a2
+  ret
+
+  .align 6
+  .globl asm_soft_reset
+asm_soft_reset:
+    csrw 0x7af, a0
+    li a1, 100
+    li a0, 0
+1:  add a1, a1, -1
+    bgeu a1, a0, 1b
+    csrw mreset, a0
+
 .section ".tdata.begin"
 .globl _tdata_begin
 _tdata_begin:

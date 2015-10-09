@@ -12,6 +12,13 @@
 #define SYS_write 64
 #define SYS_exit 93
 #define SYS_stats 1234
+#define SYS_soft_reset 617
+#define SYS_set_iobase 1226
+#define SYS_set_membase 210
+
+extern void asm_soft_reset();
+extern void asm_set_iobase(long base, long mask);
+extern void asm_set_membase(long cbase, long mask, long pbase);
 
 #define static_assert(cond) switch(0) { case 0: case !!(long)(cond): ; }
 
@@ -113,10 +120,16 @@ long handle_trap(long cause, long epc, long regs[32])
     uart_send_string(trap_rpt_buf);
     tohost_exit(1337);
   }
+  else if (regs[17] == SYS_set_iobase)
+    asm_set_iobase(regs[10], regs[11]);
+  else if (regs[17] == SYS_set_membase)
+    asm_set_membase(regs[10], regs[11], regs[12]);
   else if (regs[17] == SYS_exit)
     tohost_exit(regs[10]);
   else if (regs[17] == SYS_stats)
     sys_ret = handle_stats(regs[10]);
+  else if(regs[17] == SYS_soft_reset)
+    asm_soft_reset();
   else
     sys_ret = handle_frontend_syscall(regs[17], regs[10], regs[11], regs[12]);
 
@@ -124,7 +137,7 @@ long handle_trap(long cause, long epc, long regs[32])
   return epc+4;
 }
 
-static long syscall(long num, long arg0, long arg1, long arg2)
+long syscall(long num, long arg0, long arg1, long arg2)
 {
   register long a7 asm("a7") = num;
   register long a0 asm("a0") = arg0;
