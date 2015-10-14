@@ -4,7 +4,7 @@
 #   Generate a vivado project for the loRISC SoC
 
 set mem_data_width {128}
-set axi_id_width {8}
+set axi_id_width {9}
 
 set origin_dir "."
 set project_name [lindex $argv 0]
@@ -36,8 +36,19 @@ set files [list \
                [file normalize $origin_dir/generated-src/Top.$CONFIG.v] \
                [file normalize $origin_dir/../../../vsrc/chip_top.sv] \
                [file normalize $origin_dir/../../../vsrc/axi_bram_ctrl_top.sv] \
-               [file normalize $origin_dir/../../../vsrc/axi_crossbar_top.sv] \
                [file normalize $origin_dir/../../../socip/nasti/channel.sv] \
+               [file normalize $origin_dir/../../../socip/nasti/lite_nasti_reader.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/lite_nasti_writer.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/nasti_buf.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/nasti_combiner.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/nasti_crossbar.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/nasti_demux.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/nasti_lite_bridge.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/nasti_lite_reader.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/nasti_lite_writer.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/nasti_mux.sv ] \
+               [file normalize $origin_dir/../../../socip/nasti/nasti_slicer.sv ] \
+               [file normalize $origin_dir/../../../socip/util/arbiter.sv ] \
               ]
 add_files -norecurse -fileset [get_filesets sources_1] $files
 
@@ -82,29 +93,6 @@ set_property CONFIG.XML_INPUT_FILE [file normalize $origin_dir/script/mig_config
 generate_target {instantiation_template} \
     [get_files $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0.xci]
 
-# AXI Crossbar
-create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name axi_crossbar_mem
-set_property -dict [list \
-                        CONFIG.STRATEGY {2} \
-                        CONFIG.DATA_WIDTH $mem_data_width \
-                        CONFIG.ID_WIDTH $axi_id_width \
-                        CONFIG.S00_WRITE_ACCEPTANCE {2} \
-                        CONFIG.S00_READ_ACCEPTANCE {2} \
-                        CONFIG.M00_WRITE_ISSUING {1} \
-                        CONFIG.M01_WRITE_ISSUING {2} \
-                        CONFIG.M00_READ_ISSUING {1} \
-                        CONFIG.M00_A00_ADDR_WIDTH {16} \
-                        CONFIG.M01_READ_ISSUING {2} \
-                        CONFIG.M01_A00_BASE_ADDR {0x0000000040000000} \
-                        CONFIG.M01_A00_ADDR_WIDTH {30} \
-                        CONFIG.CONNECTIVITY_MODE {SAMD} \
-                        CONFIG.S00_THREAD_ID_WIDTH {8} \
-                        CONFIG.S01_WRITE_ACCEPTANCE {4} \
-                        CONFIG.S01_READ_ACCEPTANCE {4} \
-                        CONFIG.S01_BASE_ID {0x00000100} ] \
-    [get_ips axi_crossbar_mem]
-generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_mem/axi_crossbar_mem.xci]
-
 # AXI clock converter due to the clock difference
 create_ip -name axi_clock_converter -vendor xilinx.com -library ip -version 2.1 -module_name axi_clock_converter_0
 set_property -dict [list \
@@ -124,26 +112,6 @@ set_property -dict [list \
                         CONFIG.C_NUM_TRANSFER_BITS {8}] \
     [get_ips axi_quad_spi_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_quad_spi_0/axi_quad_spi_0.xci]
-
-# crossbar for IO space (AXI-Lite)
-create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name axi_crossbar_io
-set_property -dict [list \
-                        CONFIG.PROTOCOL {AXI4LITE} \
-                        CONFIG.ADDR_WIDTH {28} \
-                        CONFIG.CONNECTIVITY_MODE {SASD} \
-                        CONFIG.R_REGISTER {0} \
-                        CONFIG.S00_WRITE_ACCEPTANCE {1} \
-                        CONFIG.S00_READ_ACCEPTANCE {1} \
-                        CONFIG.M00_WRITE_ISSUING {1} \
-                        CONFIG.M01_WRITE_ISSUING {1} \
-                        CONFIG.M00_READ_ISSUING {1} \
-                        CONFIG.M01_READ_ISSUING {1} \
-                        CONFIG.M00_A00_ADDR_WIDTH {16} \
-                        CONFIG.M01_A00_BASE_ADDR {0x0000000000010000} \
-                        CONFIG.M01_A00_ADDR_WIDTH {16} \
-                        CONFIG.S00_SINGLE_THREAD {1}] \
-    [get_ips axi_crossbar_io]
-generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_io/axi_crossbar_io.xci]
 
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
@@ -210,5 +178,3 @@ set_msg_config -id "\[Netlist 29-345\]" -suppress
 
 # do not flatten design
 set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
-
-

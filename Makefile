@@ -33,6 +33,18 @@ verilog_srcs = \
 	$(verilog_lowrisc) \
 	$(base_dir)/vsrc/chip_top.sv \
 	$(base_dir)/socip/nasti/channel.sv \
+	$(base_dir)/socip/nasti/lite_nasti_reader.sv \
+	$(base_dir)/socip/nasti/lite_nasti_writer.sv \
+	$(base_dir)/socip/nasti/nasti_buf.sv \
+	$(base_dir)/socip/nasti/nasti_combiner.sv \
+	$(base_dir)/socip/nasti/nasti_crossbar.sv \
+	$(base_dir)/socip/nasti/nasti_demux.sv \
+	$(base_dir)/socip/nasti/nasti_lite_bridge.sv \
+	$(base_dir)/socip/nasti/nasti_lite_reader.sv \
+	$(base_dir)/socip/nasti/nasti_lite_writer.sv \
+	$(base_dir)/socip/nasti/nasti_mux.sv \
+	$(base_dir)/socip/nasti/nasti_slicer.sv \
+	$(base_dir)/socip/util/arbiter.sv \
 	$(base_dir)/vsrc/config.vh \
 
 boot_mem = src/boot.mem
