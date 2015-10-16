@@ -1,5 +1,5 @@
 # Xilinx Vivado script
-# Version: Vivado 2014.4
+# Version: Vivado 2015.3
 # Function:
 #   Generate a vivado project for the loRISC SoC
 
@@ -58,7 +58,7 @@ set_property include_dirs [list \
                                [file normalize $origin_dir/generated-src] \
                               ] [get_filesets sources_1]
 
-set_property verilog_define FPGA [get_filesets sources_1]
+set_property verilog_define [list FPGA FPGA_FULL] [get_filesets sources_1]
 
 # Set 'sources_1' fileset properties
 set_property "top" "chip_top" [get_filesets sources_1]
@@ -88,7 +88,7 @@ generate_target {instantiation_template} \
     [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_bram_ctrl_0/axi_bram_ctrl_0.xci]
 
 # Memory Controller
-create_ip -name mig_7series -vendor xilinx.com -library ip -version 2.3 -module_name mig_7series_0
+create_ip -name mig_7series -vendor xilinx.com -library ip -version 2.4 -module_name mig_7series_0
 set_property CONFIG.XML_INPUT_FILE [file normalize $origin_dir/script/mig_config.prj] [get_ips mig_7series_0]
 generate_target {instantiation_template} \
     [get_files $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0.xci]
@@ -141,7 +141,9 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 set obj [get_filesets sim_1]
 set files [list \
                [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
-               [file normalize $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0/example_design/sim/ddr3_model.v] \
+               [file normalize $origin_dir/../../../vsrc/host_behav.sv] \
+               [file normalize $origin_dir/../../../vsrc/nasti_ram_behav.sv] \
+               [file normalize $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0/example_design/sim/ddr3_model.sv] \
               ]
 add_files -norecurse -fileset $obj $files
 
@@ -150,11 +152,10 @@ set_property include_dirs [list \
                                [file normalize $origin_dir/src] \
                                [file normalize $origin_dir/generated-src] \
                                [file normalize $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0/example_design/sim] \
-                              ] [get_filesets sim_1]
-set_property verilog_define [list \
-                                 FPGA \
-                                ] [get_filesets sim_1]
+                              ] $obj
+set_property verilog_define [list FPGA ] $obj
 
+set_property -name {xsim.elaborate.xelab.more_options} -value {-cc gcc -sv_lib dpi} -objects $obj
 set_property "top" "tb" $obj
 
 # force create the sim_1/behav path (need to make soft link in Makefile)

@@ -4,6 +4,10 @@
 # global define
 #--------------------------------------------------------------------
 
+ifndef XILINX_VIVADO
+$(error Please set environment variable XILINX_VIVADO for Xilinx tools)
+endif
+
 default: project
 
 base_dir = $(abspath ../../..)
@@ -51,6 +55,18 @@ boot_mem = src/boot.mem
 
 testbench_srcs = \
 	$(base_dir)/vsrc/chip_top_tb.sv \
+	$(base_dir)/vsrc/host_behav.sv \
+	$(base_dir)/vsrc/nasti_ram_behav.sv \
+
+dpi_srcs = \
+	$(base_dir)/csrc/common/globals.cpp \
+	$(base_dir)/csrc/common/dpi_ram_behav.cpp \
+	$(base_dir)/csrc/common/dpi_host_behav.cpp \
+
+dpi_headers = \
+	$(base_dir)/csrc/common/globals.h \
+	$(base_dir)/csrc/common/dpi_ram_behav.h \
+	$(base_dir)/csrc/common/dpi_host_behav.h \
 
 #--------------------------------------------------------------------
 # Build Verilog
@@ -93,6 +109,25 @@ bitstream: $(bitstream)
 $(bitstream): $(verilog_lowrisc) $(verilog_srcs) $(boot_mem) | $(project)
 	$(VIVADO) -mode batch -source ../../common/script/make_bitstream.tcl -tclargs $(project_name)
 
+.PHONY: project vivado bitstream
+
+#--------------------------------------------------------------------
+# DPI compilation
+#--------------------------------------------------------------------
+dpi_lib = $(project_name)/$(project_name).sim/sim_1/behav/xsim.dir/xsc/dpi.so
+dpi: $(dpi_lib)
+$(dpi_lib): $(dpi_srcs) $(dpi_headers)
+	-mkdir -p $(project_name)/$(project_name).sim/sim_1/behav/xsim.dir/xsc
+	cd $(project_name)/$(project_name).sim/sim_1/behav; \
+	g++ -Wa,-W -fPIC -m64 -O1 -std=c++11 -shared -I$(XILINX_VIVADO)/data/xsim/include -I$(base_dir)/csrc/common \
+	$(dpi_srcs) $(XILINX_VIVADO)/lib/lnx64.o/librdi_simulator_kernel.so -o $(proj_dir)/$@
+
+.PHONY: dpi
+
+#--------------------------------------------------------------------
+# FPGA simulation
+#--------------------------------------------------------------------
+
 sim-comp = $(project_name)/$(project_name).sim/sim_1/behav/compile.log
 sim-comp: $(sim-comp)
 $(sim-comp): $(verilog_lowrisc) $(verilog_srcs) $(testbench_srcs) | $(project)
@@ -101,14 +136,14 @@ $(sim-comp): $(verilog_lowrisc) $(verilog_srcs) $(testbench_srcs) | $(project)
 
 sim-elab = $(project_name)/$(project_name).sim/sim_1/behav/elaborate.log
 sim-elab: $(sim-elab)
-$(sim-elab): $(sim-comp)
+$(sim-elab): $(sim-comp) $(dpi_lib)
 	cd $(project_name)/$(project_name).sim/sim_1/behav; source elaborate.sh > /dev/null
 	@echo "If error, see $(project_name)/$(project_name).sim/sim_1/behav/elaborate.log for more details."
 
 simulation: $(sim-elab)
 	cd $(project_name)/$(project_name).sim/sim_1/behav; xsim tb_behav -key {Behavioral:sim_1:Functional:tb} -tclbatch $(proj_dir)/script/simulate.tcl -log $(proj_dir)/simulate.log
 
-.PHONY: project vivado bitstream sim-comp sim-elab simulation
+.PHONY: sim-comp sim-elab simulation
 
 #--------------------------------------------------------------------
 # Debug helper
