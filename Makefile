@@ -153,7 +153,7 @@ search-ramb:
 	$(VIVADO) -mode batch -source ../../common/script/search_ramb.tcl -tclargs $(project_name)
 
 bit-update: $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
-$(project_name)/$(project_name).runs/impl_1/chip_top.new.bit: src/boot.mem
+$(project_name)/$(project_name).runs/impl_1/chip_top.new.bit: src/boot.mem src/boot.bmm
 	data2mem -bm src/boot.bmm -bd $< -bt $(bitstream) -o b $@
 
 .PHONY: search-ramb bit-update
