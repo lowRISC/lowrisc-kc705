@@ -13,12 +13,20 @@
 #define SYS_exit 93
 #define SYS_stats 1234
 #define SYS_soft_reset 617
-#define SYS_set_iobase 1226
-#define SYS_set_membase 210
+#define SYS_set_iobase 0x12200
+#define SYS_set_membase 0x2100
 
 extern void asm_soft_reset();
-extern void asm_set_iobase(long base, long mask);
-extern void asm_set_membase(long cbase, long mask, long pbase);
+extern void asm_set_iobase0(long base, long mask);
+extern void asm_set_iobase1(long base, long mask);
+extern void asm_set_iobase2(long base, long mask);
+extern void asm_set_iobase3(long base, long mask);
+extern void asm_update_iospace();
+extern void asm_set_membase0(long cbase, long mask, long pbase);
+extern void asm_set_membase1(long cbase, long mask, long pbase);
+extern void asm_set_membase2(long cbase, long mask, long pbase);
+extern void asm_set_membase3(long cbase, long mask, long pbase);
+extern void asm_update_memspace();
 
 #define static_assert(cond) switch(0) { case 0: case !!(long)(cond): ; }
 
@@ -120,11 +128,23 @@ long handle_trap(long cause, long epc, long regs[32])
     uart_send_string(trap_rpt_buf);
     tohost_exit(1337);
   }
-  else if (regs[17] == SYS_set_iobase)
-    asm_set_iobase(regs[10], regs[11]);
-  else if (regs[17] == SYS_set_membase)
-    asm_set_membase(regs[10], regs[11], regs[12]);
-  else if (regs[17] == SYS_exit)
+  else if ((regs[17] & SYS_set_iobase) == SYS_set_iobase) {
+    switch(regs[17] & 0x7) {
+    case 0: asm_set_iobase0(regs[10], regs[11]); break;
+    case 1: asm_set_iobase1(regs[10], regs[11]); break;
+    case 2: asm_set_iobase2(regs[10], regs[11]); break;
+    case 3: asm_set_iobase3(regs[10], regs[11]); break;
+    default: asm_update_iospace(); break;
+    }
+  } else if ((regs[17] & SYS_set_membase) == SYS_set_membase) {
+    switch(regs[17] & 0x7) {
+    case 0: asm_set_membase0(regs[10], regs[11], regs[12]); break;
+    case 1: asm_set_membase1(regs[10], regs[11], regs[12]); break;
+    case 2: asm_set_membase2(regs[10], regs[11], regs[12]); break;
+    case 3: asm_set_membase3(regs[10], regs[11], regs[12]); break;
+    default: asm_update_memspace(); break;
+    }
+  } else if (regs[17] == SYS_exit)
     tohost_exit(regs[10]);
   else if (regs[17] == SYS_stats)
     sys_ret = handle_stats(regs[10]);

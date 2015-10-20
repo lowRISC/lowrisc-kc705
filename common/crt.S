@@ -226,18 +226,66 @@ trap_entry:
   addi sp, sp, 272
   eret
 
-  .global asm_set_iobase
-asm_set_iobase:
+  .global asm_set_iobase0
+asm_set_iobase0:
   csrw    0x7b0, a0
   csrw    0x7b1, a1
+  ret
+
+  .global asm_set_iobase1
+asm_set_iobase1:
+  csrw    0x7b4, a0
+  csrw    0x7b5, a1
+  ret
+
+  .global asm_set_iobase2
+asm_set_iobase2:
+  csrw    0x7b8, a0
+  csrw    0x7b9, a1
+  ret
+
+  .global asm_set_iobase3
+asm_set_iobase3:
+  csrw    0x7bc, a0
+  csrw    0x7bd, a1
+  ret
+
+  .global asm_update_iospace
+asm_update_iospace:
   csrw    0x7bf, a0
   ret
 
-  .global asm_set_membase
-asm_set_membase:
+  .global asm_set_membase0
+asm_set_membase0:
   csrw    0x7a0, a0
   csrw    0x7a1, a1
   csrw    0x7a2, a2
+  ret
+
+  .global asm_set_membase1
+asm_set_membase1:
+  csrw    0x7a4, a0
+  csrw    0x7a5, a1
+  csrw    0x7a6, a2
+  ret
+
+  .global asm_set_membase2
+asm_set_membase2:
+  csrw    0x7a8, a0
+  csrw    0x7a9, a1
+  csrw    0x7aa, a2
+  ret
+
+  .global asm_set_membase3
+asm_set_membase3:
+  csrw    0x7ac, a0
+  csrw    0x7ad, a1
+  csrw    0x7ae, a2
+  ret
+
+  .global asm_update_memspace
+asm_update_memspace:
+  csrw    0x7af, a0
   ret
 
   .align 6
