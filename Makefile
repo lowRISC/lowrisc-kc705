@@ -149,8 +149,10 @@ simulation: $(sim-elab)
 # Debug helper
 #--------------------------------------------------------------------
 
-search-ramb:
-	$(VIVADO) -mode batch -source ../../common/script/search_ramb.tcl -tclargs $(project_name)
+search-ramb: src/boot.bmm
+src/boot.bmm:
+	$(VIVADO) -mode batch -source ../../common/script/search_ramb.tcl -tclargs $(project_name) > search-ramb.log
+	python ../../common/script/bmm_gen.py search-ramb.log src/boot.bmm 128 65536
 
 bit-update: $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
 $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit: src/boot.mem src/boot.bmm
