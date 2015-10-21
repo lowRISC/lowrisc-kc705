@@ -1,0 +1,93 @@
+#=======================================================================
+# Shared Makefile components for all lowrisc tests
+#-----------------------------------------------------------------------
+# See LICENSE for license details.
+
+# check RISCV environment variable
+ifndef RISCV
+$(error Please set environment variable RISCV. Please take a look at README)
+endif
+
+#--------------------------------------------------------------------
+# Build rules
+#--------------------------------------------------------------------
+
+RISCV_PREFIX=riscv64-unknown-elf-
+RISCV_GCC = $(RISCV_PREFIX)gcc
+RISCV_DUMP = $(RISCV_PREFIX)objdump
+RISCV_GCC_OPTS = -static -Wa,-march=RVIMAFD -std=gnu99 -g -ffast-math -fno-common -fno-builtin-printf -I../common -I../drive -I../../riscv-tests/env -I../fatfs
+RISCV_DUMP_OPTS = -D -S -l
+RISCV_LINK = $(RISCV_GCC) -T ../common/test.ld
+RISCV_LINK_OPTS = -nostdlib -nostartfiles -ffast-math -lc -lgcc
+
+
+#--------------------------------------------------------------------
+# Objects
+#--------------------------------------------------------------------
+
+OBJS += \
+	../common/syscalls.o \
+	crt.o \
+
+../common/syscalls.o: ../common/syscalls.c
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+crt.o: ../common/crt.S
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+../drive/uart.o:../drive/uart.c ../drive/uart.h ../drive/device_map.h
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+../drive/spi.o:../drive/spi.c ../drive/spi.h ../drive/device_map.h
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+../drive/elf.o:../drive/elf.c ../drive/elf.h
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+../drive/memory.o:../drive/memory.c ../drive/memory.h ../drive/device_map.h
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+../fatfs/diskio.o: ../fatfs/diskio.c ../fatfs/diskio.h ../drive/spi.h ../drive/device_map.h
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+../fatfs/ff.o: ../fatfs/ff.c ../fatfs/ff.h ../fatfs/ffconf.h ../fatfs/diskio.h ../drive/spi.h ../drive/device_map.h
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+junk += crt.o
+
+#--------------------------------------------------------------------
+# Building Targets
+#--------------------------------------------------------------------
+
+all: $(TARGET).hex
+
+dump: $(TARGET).dump
+
+$(TARGET): $(OBJS)
+	$(RISCV_LINK) -o $@ $^ $(RISCV_LINK_OPTS)
+
+$(TARGET).hex: $(TARGET)
+	elf2hex 16 4096 $< > $@
+
+$(TARGET).dump: $(TARGET)
+	$(RISCV_DUMP) $(RISCV_DUMP_OPTS) $< > $@
+
+.PHONY: all dump
+
+junk += $(TARGET) $(TARGET).hex $(TARGET).dump
+
+#--------------------------------------------------------------------
+# clean up
+#--------------------------------------------------------------------
+
+clean:
+	rm -rf $(junk)
+
+.PHONY: clean
+
+
+# emacs local variable
+
+# Local Variables:
+# mode: makefile
+# End:

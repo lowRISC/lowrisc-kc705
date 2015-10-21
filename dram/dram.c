@@ -15,6 +15,17 @@ unsigned long long lfsr64(unsigned long long d) {
   return (d >> 1) | (bit << 63);
 }
 
+#define SYS_soft_reset 617
+#define SYS_set_iobase 0x12200
+#define SYS_set_membase 0x2100
+extern long syscall(long num, long arg0, long arg1, long arg2);
+
+//#define STEP_SIZE 16
+#define STEP_SIZE 1024*16
+//#define VERIFY_DISTANCE 2
+#define VERIFY_DISTANCE 16
+
+
 int main() {
   unsigned long waddr = 0;
   unsigned long raddr = 0;
@@ -25,17 +36,25 @@ int main() {
   uart_init();
   printf("DRAM test program.\n");
 
+  // map DDR3 to IO
+  syscall(SYS_set_membase, 0x0, 0x3fffffff, 0x0); /* BRAM, 0x00000000 - 0x3fffffff */
+  syscall(SYS_set_membase+5, 0, 0, 0);            /* update memory space */
+
+  syscall(SYS_set_iobase, 0x80000000, 0x7fffffff, 0);   /* IO devices, 0x80000000 - 0xffffffff */
+  syscall(SYS_set_iobase+1, 0x40000000, 0x3fffffff, 0); /* DDR3, 0x40000000 - 0x7fffffff */
+  syscall(SYS_set_iobase+5, 0, 0, 0);                   /* update io space */
+
   while(1) {
     printf("Write block @%lx using key %llx\n", waddr, wkey);
-    for(i=0; i<1024*16; i++) {
+    for(i=0; i<STEP_SIZE; i++) {
       *(get_ddr_base() + waddr) = wkey;
       waddr = (waddr + 1) & 0x3ffffff;
       wkey = lfsr64(wkey);
     }
 
-    if(waddr == (raddr + 16*1024*16) & 0x3ffffff) { /* read after write 1M, force write back in L2 */
+    if(waddr == (raddr + VERIFY_DISTANCE*STEP_SIZE) & 0x3ffffff) { /* read after write 1M, force write back in L2 */
       printf("Check block @%lx using key %llx\n", raddr, rkey);
-      for(i=0; i<1024*16; i++) {
+      for(i=0; i<STEP_SIZE; i++) {
         unsigned long long rd = *(get_ddr_base() + raddr);
         raddr = (raddr + 1) & 0x3ffffff;
         if(rkey != rd) {

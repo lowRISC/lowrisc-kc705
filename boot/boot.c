@@ -12,12 +12,25 @@ FATFS FatFs;   /* Work area (file system object) for logical drive */
 // 4K size read burst
 #define SD_READ_SIZE 4096
 
+#define SYS_soft_reset 617
+#define SYS_set_iobase 0x12200
+#define SYS_set_membase 0x2100
+extern long syscall(long num, long arg0, long arg1, long arg2);
+
 int main (void)
 {
   FIL fil;                /* File object */
   FRESULT fr;             /* FatFs return code */
   uint8_t *boot_file_buf = (uint8_t *)(get_ddr_base()) + 0x38000000; // 0x8000000 (128M)
   uint8_t *memory_base = (uint8_t *)(get_ddr_base());
+
+  // map DDR3 to IO
+  syscall(SYS_set_membase, 0x0, 0x3fffffff, 0x0); /* BRAM, 0x00000000 - 0x3fffffff */
+  syscall(SYS_set_membase+5, 0, 0, 0);            /* update memory space */
+
+  syscall(SYS_set_iobase, 0x80000000, 0x7fffffff, 0);   /* IO devices, 0x80000000 - 0xffffffff */
+  syscall(SYS_set_iobase+1, 0x40000000, 0x3fffffff, 0); /* DDR3, 0x40000000 - 0x7fffffff */
+  syscall(SYS_set_iobase+5, 0, 0, 0);                   /* update io space */
 
   uart_init();
 
@@ -51,6 +64,14 @@ int main (void)
   f_close(&fil);
 
   printf("read the loaded program:\n");
+
+  // remap DDR3 to memory space
+  syscall(SYS_set_membase, 0x0, 0x7fffffff, 0x0); /* BRAM, 0x00000000 - 0x3fffffff */
+  syscall(SYS_set_membase+5, 0, 0, 0);            /* update memory space */
+
+  syscall(SYS_set_iobase, 0x80000000, 0x7fffffff, 0); /* IO devices, 0x80000000 - 0xffffffff */
+  syscall(SYS_set_iobase+1, 0, 0, 0);                 /* clear prevvious mapping */
+  syscall(SYS_set_iobase+5, 0, 0, 0);                 /* update io space */
 
   uint64_t *memory = (uint64_t *)memory_base;
   do {
