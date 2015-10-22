@@ -149,8 +149,7 @@ simulation: $(sim-elab)
 # Debug helper
 #--------------------------------------------------------------------
 
-search-ramb: src/boot.bmm
-src/boot.bmm:
+search-ramb:
 	$(VIVADO) -mode batch -source ../../common/script/search_ramb.tcl -tclargs $(project_name) > search-ramb.log
 	python ../../common/script/bmm_gen.py search-ramb.log src/boot.bmm 128 65536
 
