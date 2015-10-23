@@ -10,6 +10,7 @@ TARGET = reset
 OBJS += \
 	reset.o \
 	../drive/uart.o \
+	../drive/memory.o \
 
 include ../Makefrag
 

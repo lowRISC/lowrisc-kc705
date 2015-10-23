@@ -1,26 +1,36 @@
 
-#include <stdint.h>
-#include "device_map.h"
+// testing the reset process
+// simulation only
 
-volatile uint64_t *memory_record = (uint64_t *)(IO_SPACE_BASE);
-volatile uint64_t *memory_orig_base = (uint64_t *)(0x00000);
-volatile uint64_t *memory_copy_base = (uint64_t *)(0x4000);
+#include <stdint.h>
+#include "memory.h"
+
+#define SYS_soft_reset 617
+#define SYS_set_iobase 0x12200
+#define SYS_set_membase 0x2100
 extern long syscall(long num, long arg0, long arg1, long arg2);
 
 int main() {
 
-  syscall(1226, IO_SPACE_BASE, IO_SPACE_BASE-1, 0);
+  // map DDR3 to IO
+  syscall(SYS_set_membase, 0x0, 0x3fffffff, 0x0); /* BRAM, 0x00000000 - 0x3fffffff */
+  syscall(SYS_set_membase+5, 0, 0, 0);            /* update memory space */
+
+  syscall(SYS_set_iobase, 0x80000000, 0x7fffffff, 0);   /* IO devices, 0x80000000 - 0xffffffff */
+  syscall(SYS_set_iobase+1, 0x40000000, 0x3fffffff, 0); /* DDR3, 0x40000000 - 0x7fffffff */
+  syscall(SYS_set_iobase+5, 0, 0, 0);                   /* update io space */
 
   uint64_t offset = 0;
-  for(; offset < 0x4000/8; offset++)
-    *(memory_copy_base + offset) = *(memory_orig_base + offset);
+  for(; offset < 0x1000/8; offset++)
+    *(get_ddr_base() + offset) = 0x0000001300000013;
 
-  if(*(memory_record) == 0x10000)
-    return 0;
-  else {
-    *(memory_record) += 0x4000;
-    syscall(210, 0, IO_SPACE_BASE-1, *(memory_record));
-    syscall(617, 0, 0, 0);
-  }
-  return 1;
+  // map DDR3 to 0x0
+  syscall(SYS_set_iobase, 0x80000000, 0x7fffffff, 0); /* IO devices, 0x80000000 - 0xffffffff */
+  syscall(SYS_set_iobase+1, 0, 0, 0);                 /* clear previous mapping */
+  syscall(SYS_set_iobase+5, 0, 0, 0);                 /* update io space */
+
+  syscall(SYS_set_membase, 0x0, 0x3fffffff, 0x40000000);
+  syscall(SYS_soft_reset, 0, 0, 0);                      /* soft reset */
+
+  return 0;
 }

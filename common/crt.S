@@ -295,7 +295,7 @@ asm_soft_reset:
     li a1, 100
     li a0, 0
 1:  add a1, a1, -1
-    bgeu a1, a0, 1b
+    bne a1, a0, 1b
     csrw mreset, a0
 
 .section ".tdata.begin"

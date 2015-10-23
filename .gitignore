@@ -2,4 +2,6 @@
 *.o
 *.hex
 *.mem
+*.dump
+*.riscv
 

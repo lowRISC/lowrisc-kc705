@@ -63,18 +63,18 @@ all: $(TARGET).hex
 
 dump: $(TARGET).dump
 
-$(TARGET): $(OBJS)
+$(TARGET).riscv: $(OBJS)
 	$(RISCV_LINK) -o $@ $^ $(RISCV_LINK_OPTS)
 
-$(TARGET).hex: $(TARGET)
+$(TARGET).hex: $(TARGET).riscv
 	elf2hex 16 4096 $< > $@
 
-$(TARGET).dump: $(TARGET)
+$(TARGET).dump: $(TARGET).riscv
 	$(RISCV_DUMP) $(RISCV_DUMP_OPTS) $< > $@
 
 .PHONY: all dump
 
-junk += $(TARGET) $(TARGET).hex $(TARGET).dump
+junk += $(TARGET).riscv $(TARGET).hex $(TARGET).dump
 
 #--------------------------------------------------------------------
 # clean up
