@@ -1,0 +1,25 @@
+fsbl_subproject_deps = 
+
+fsbl_hdrs = \
+	encoding.h \
+	file.h \
+	frontend.h \
+	elf.h \
+	vm.h \
+	pk.h \
+	syscall.h \
+
+fsbl_c_srcs = \
+	minit.c \
+	init.c \
+	frontend.c \
+	elf.c \
+	console.c \
+	vm.c \
+
+fsbl_asm_srcs = 
+
+fsbl_test_srcs =
+
+fsbl_install_prog_srcs = \
+	lrbl.c \

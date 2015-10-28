@@ -19,11 +19,6 @@ typedef struct
   long insn;
 } trapframe_t;
 
-struct mainvars {
-  uint64_t argc;
-  uint64_t argv[127]; // this space is shared with the arg strings themselves
-};
-
 #define panic(s,...) do { do_panic(s"\n", ##__VA_ARGS__); } while(0)
 #define kassert(cond) do { if(!(cond)) kassert_fail(""#cond); } while(0)
 void do_panic(const char* s, ...) __attribute__((noreturn));
@@ -53,15 +48,14 @@ int snprintf(char* out, size_t n, const char* s, ...);
 void init_tf(trapframe_t*, long pc, long sp, int user64);
 void start_user(trapframe_t* tf) __attribute__((noreturn));
 void dump_tf(trapframe_t*);
-void print_logo();
 
 void unhandled_trap(trapframe_t*);
 void handle_misaligned_load(trapframe_t*);
 void handle_misaligned_store(trapframe_t*);
 void handle_fault_load(trapframe_t*);
 void handle_fault_store(trapframe_t*);
-void boot_loader(struct mainvars*);
-void run_loaded_program(struct mainvars*);
+void boot_loader();
+void run_loaded_program();
 void boot_other_hart();
 
 typedef struct {

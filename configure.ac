@@ -15,9 +15,9 @@
 # Project metadata
 #-------------------------------------------------------------------------
 
-m4_define( proj_name,         [RISC-V Proxy Kernel])
-m4_define( proj_maintainer,   [Andrew Waterman])
-m4_define( proj_abbreviation, [riscv-pk])
+m4_define( proj_name,         [lowRISC First Stage Bootloader])
+m4_define( proj_maintainer,   [Wei Song])
+m4_define( proj_abbreviation, [lowrisc-fsbl])
 
 #-------------------------------------------------------------------------
 # Project version information
@@ -37,7 +37,7 @@ m4_define( proj_version, [?])
 #-------------------------------------------------------------------------
 
 AC_INIT(proj_name,proj_version,proj_maintainer,proj_abbreviation)
-AC_CONFIG_SRCDIR([pk/pk.h])
+AC_CONFIG_SRCDIR([fsbl/fsbl.h])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
@@ -81,7 +81,7 @@ AC_SUBST([LIBS],  ["-lgcc"])
 # The '*' suffix indicates an optional subproject. The '**' suffix
 # indicates an optional subproject which is also the name of a group.
 
-MCPPBS_SUBPROJECTS([ pk, softfloat ])
+MCPPBS_SUBPROJECTS([ fsbl ])
 
 #-------------------------------------------------------------------------
 # MCPPBS subproject groups

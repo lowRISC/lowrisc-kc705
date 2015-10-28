@@ -63,13 +63,9 @@ static void hls_init(uint32_t hart_id)
 static void init_first_hart()
 {
   file_init();
-
-  struct mainvars arg_buffer;
-  struct mainvars *args = parse_args(&arg_buffer);
-
   memory_init();
   vm_init();
-  boot_loader(args);
+  boot_loader();
 }
 
 static void init_other_hart()
