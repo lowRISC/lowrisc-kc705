@@ -9,3 +9,7 @@ DVEfiles
 generated-src
 ramb_result.txt
 boot.bmm
+*.o
+*.hex
+*.dump
+*.riscv
