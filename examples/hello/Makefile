@@ -3,15 +3,15 @@
 #-----------------------------------------------------------------------
 # See LICENSE for license details.
 
+include ../../Makefrag
+
 default: all
 
 TARGET = hello
 
 OBJS += \
 	hello.o \
-	../drive/uart.o \
-
-include ../Makefrag
+	$(DRIVER_DIR)/uart.o \
 
 #--------------------------------------------------------------------
 # Build

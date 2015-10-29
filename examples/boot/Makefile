@@ -3,26 +3,27 @@
 #-----------------------------------------------------------------------
 # See LICENSE for license details.
 
+include ../Makefrag
+
 default: all
 
 TARGET = boot
 
 OBJS += \
 	boot.o \
-	../drive/spi.o \
-	../drive/uart.o \
-	../drive/memory.o \
-	../drive/elf.o \
-	../fatfs/diskio.o \
-	../fatfs/ff.o \
+	$(DRIVER_DIR)/spi.o \
+	$(DRIVER_DIR)/uart.o \
+	$(DRIVER_DIR)/memory.o \
+	$(DRIVER_DIR)/elf.o \
+	$(DRIVER_DIR)/diskio.o \
+	$(DRIVER_DIR)/ff.o \
 
-include ../Makefrag
 
 #--------------------------------------------------------------------
 # Build
 #--------------------------------------------------------------------
 
-boot.o: boot.c ../drive/uart.h ../drive/memory.h ../drive/spi.h ../fatfs/ff.h
+boot.o: boot.c $(DRIVER_DIR)/uart.h $(DRIVER_DIR)/memory.h $(DRIVER_DIR)/spi.h $(DRIVER_DIR)/ff.h
 	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
 junk += boot.o

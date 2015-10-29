@@ -3,24 +3,24 @@
 #-----------------------------------------------------------------------
 # See LICENSE for license details.
 
+include ../Makefrag
+
 default: all
 
 TARGET = sdcard
 
 OBJS += \
 	sdcard.o \
-	../drive/spi.o \
-	../drive/uart.o \
-	../fatfs/diskio.o \
-	../fatfs/ff.o \
-
-include ../Makefrag
+	$(DRIVER_DIR)/spi.o \
+	$(DRIVER_DIR)/uart.o \
+	$(DRIVER_DIR)/diskio.o \
+	$(DRIVER_DIR)/ff.o \
 
 #--------------------------------------------------------------------
 # Build
 #--------------------------------------------------------------------
 
-sdcard.o: sdcard.c ../drive/uart.h ../fatfs/ff.h ../fatfs/diskio.h ../drive/spi.h ../drive/device_map.h
+sdcard.o: sdcard.c $(DRIVER_DIR)/uart.h $(DRIVER_DIR)/ff.h $(DRIVER_DIR)/diskio.h $(DRIVER_DIR)/spi.h $(DRIVER_DIR)/device_map.h
 	$(RISCV_GCC) -static -DBARE_MODE $(RISCV_GCC_OPTS) -c $< -o $@
 
 junk += sdcard.o

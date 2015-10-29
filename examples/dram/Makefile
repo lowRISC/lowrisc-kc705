@@ -3,22 +3,23 @@
 #-----------------------------------------------------------------------
 # See LICENSE for license details.
 
+include ../Makefrag
+
 default: all
 
 TARGET = dram
 
 OBJS += \
 	dram.o \
-	../drive/uart.o \
-	../drive/memory.o \
+	$(DRIVER_DIR)/uart.o \
+	$(DRIVER_DIR)/memory.o \
 
-include ../Makefrag
 
 #--------------------------------------------------------------------
 # Build
 #--------------------------------------------------------------------
 
-dram.o: dram.c ../drive/memory.h ../drive/uart.h ../drive/device_map.h
+dram.o: dram.c $(DRIVER_DIR)/memory.h $(DRIVER_DIR)/uart.h $(DRIVER_DIR)/device_map.h
 	$(RISCV_GCC) -static -DBARE_MODE $(RISCV_GCC_OPTS) -c $< -o $@
 
 junk += dram.o
