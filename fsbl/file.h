@@ -8,32 +8,25 @@
 #include <stdint.h>
 #include "atomic.h"
 
+// FatFS
+#include "ff.h"
+
 typedef struct file
 {
-  int kfd; // file descriptor on the host side of the HTIF
-  uint32_t refcnt;
+  FIL fd;                       /* FatFS file handler */
+  uint32_t offset;              /* remember current fp position */
 } file_t;
 
-extern file_t files[];
-#define stdin  (files + 0)
-#define stdout (files + 1)
-#define stderr (files + 2)
-
-file_t* file_get(int fd);
 file_t* file_open(const char* fn, int flags, int mode);
-void file_decref(file_t*);
-void file_incref(file_t*);
-int file_dup(file_t*);
-
-file_t* file_openat(int dirfd, const char* fn, int flags, int mode);
+//file_t* file_openat(int dirfd, const char* fn, int flags, int mode);
 ssize_t file_pwrite(file_t* f, const void* buf, size_t n, off_t off);
 ssize_t file_pread(file_t* f, void* buf, size_t n, off_t off);
 ssize_t file_write(file_t* f, const void* buf, size_t n);
 ssize_t file_read(file_t* f, void* buf, size_t n);
 ssize_t file_lseek(file_t* f, size_t ptr, int dir);
-int file_truncate(file_t* f, off_t len);
-int file_stat(file_t* f, struct stat* s);
-int fd_close(int fd);
+//int file_truncate(file_t* f, off_t len);
+int file_stat(const char* fn, struct stat* s);
+int fd_close(file_t* f);
 
 void file_init();
 
