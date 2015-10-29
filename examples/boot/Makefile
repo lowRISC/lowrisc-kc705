@@ -3,11 +3,12 @@
 #-----------------------------------------------------------------------
 # See LICENSE for license details.
 
-include ../Makefrag
 
 default: all
 
 TARGET = boot
+
+DRIVER_DIR = ../../driver
 
 OBJS += \
 	boot.o \
@@ -18,6 +19,7 @@ OBJS += \
 	$(DRIVER_DIR)/diskio.o \
 	$(DRIVER_DIR)/ff.o \
 
+include ../../Makefrag
 
 #--------------------------------------------------------------------
 # Build

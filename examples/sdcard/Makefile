@@ -3,11 +3,11 @@
 #-----------------------------------------------------------------------
 # See LICENSE for license details.
 
-include ../Makefrag
-
 default: all
 
 TARGET = sdcard
+
+DRIVER_DIR = ../../driver
 
 OBJS += \
 	sdcard.o \
@@ -15,6 +15,8 @@ OBJS += \
 	$(DRIVER_DIR)/uart.o \
 	$(DRIVER_DIR)/diskio.o \
 	$(DRIVER_DIR)/ff.o \
+
+include ../../Makefrag
 
 #--------------------------------------------------------------------
 # Build

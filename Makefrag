@@ -12,7 +12,6 @@ endif
 # Build rules
 #--------------------------------------------------------------------
 
-DRIVER_DIR = ../../driver
 RISCV_PREFIX=riscv64-unknown-elf-
 RISCV_GCC = $(RISCV_PREFIX)gcc
 RISCV_DUMP = $(RISCV_PREFIX)objdump

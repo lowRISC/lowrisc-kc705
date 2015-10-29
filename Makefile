@@ -164,24 +164,20 @@ $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit: $(boot_mem) src/bo
 # Load examples
 #--------------------------------------------------------------------
 test-hello:
-	$(MAKE) -C examples/hello && \
-	cp examples/hello/hello.hex $(boot_mem) && \
-	make bit-update
+	cd examples/hello && make
+	cp examples/hello/hello.hex $(boot_mem) && make bit-update
 
 test-boot:
-	$(MAKE) -C examples/boot && \
-	cp examples/boot/boot.hex $(boot_mem) && \
-	make bit-update
+	cd examples/boot && make
+	cp examples/boot/boot.hex $(boot_mem) && make bit-update
 
 test-dram:
-	$(MAKE) -C examples/dram && \
-	cp examples/dram/dram.hex $(boot_mem) && \
-	make bit-update
+	cd examples/dram && make
+	cp examples/dram/dram.hex $(boot_mem) && make bit-update
 
 test-sdcard:
-	$(MAKE) -C examples/sdcard && \
-	cp examples/sdcard/sdcard.hex $(boot_mem) && \
-	make bit-update
+	cd examples/sdcard && make
+	cp examples/sdcard/sdcard.hex $(boot_mem) && make bit-update
 
 #--------------------------------------------------------------------
 # Clean up
