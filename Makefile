@@ -98,15 +98,15 @@ project = $(project_name)/$(project_name).xpr
 project: $(project)
 $(project): | $(verilog_lowrisc)
 	$(VIVADO) -mode batch -source script/make_project.tcl -tclargs $(project_name) $(CONFIG)
-	ln -s $(proj_dir)/src/boot.mem $(project_name)/$(project_name).runs/synth_1/boot.mem
-	ln -s $(proj_dir)/src/boot.mem $(project_name)/$(project_name).sim/sim_1/behav/boot.mem
+	ln -s $(proj_dir)/$(boot_mem) $(project_name)/$(project_name).runs/synth_1/boot.mem
+	ln -s $(proj_dir)/$(boot_mem) $(project_name)/$(project_name).sim/sim_1/behav/boot.mem
 
 vivado: $(project)
 	$(VIVADO) $(project) &
 
 bitstream = $(project_name)/$(project_name).runs/impl_1/chip_top.bit
 bitstream: $(bitstream)
-$(bitstream): $(verilog_lowrisc) $(verilog_srcs) $(boot_mem) | $(project)
+$(bitstream): $(verilog_lowrisc) $(verilog_srcs) | $(project)
 	$(VIVADO) -mode batch -source ../../common/script/make_bitstream.tcl -tclargs $(project_name)
 
 .PHONY: project vivado bitstream
@@ -149,15 +149,35 @@ simulation: $(sim-elab)
 # Debug helper
 #--------------------------------------------------------------------
 
-search-ramb:
+search-ramb: src/boot.bmm
+src/boot.bmm: $(bitstream)
 	$(VIVADO) -mode batch -source ../../common/script/search_ramb.tcl -tclargs $(project_name) > search-ramb.log
 	python ../../common/script/bmm_gen.py search-ramb.log src/boot.bmm 128 65536
 
 bit-update: $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
-$(project_name)/$(project_name).runs/impl_1/chip_top.new.bit: src/boot.mem src/boot.bmm
-	data2mem -bm src/boot.bmm -bd $< -bt $(bitstream) -o b $@
+$(project_name)/$(project_name).runs/impl_1/chip_top.new.bit: $(boot_mem) src/boot.bmm
+	data2mem -bm $(boot_mem) -bd $< -bt $(bitstream) -o b $@
 
 .PHONY: search-ramb bit-update
+
+#--------------------------------------------------------------------
+# Load examples
+#--------------------------------------------------------------------
+test-hello:
+	cd examples/hello && make
+	cp examples/hello/hello.hex $(boot_mem) && make bit-update
+
+test-boot:
+	cd examples/boot && make
+	cp examples/boot/boot.hex $(boot_mem) && make bit-update
+
+test-dram:
+	cd examples/dram && make
+	cp examples/dram/dram.hex $(boot_mem) && make bit-update
+
+test-sdcard:
+	cd examples/sdcard && make
+	cp examples/sdcard/sdcard.hex $(boot_mem) && make bit-update
 
 #--------------------------------------------------------------------
 # Clean up
