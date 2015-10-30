@@ -1,0 +1,4 @@
+AC_ARG_ENABLE([atomics], AS_HELP_STRING([--disable-atomics], [Emulate atomic ops nonatomically]))
+AS_IF([test "x$enable_atomics" != "xno"], [
+  AC_DEFINE([ENABLE_ATOMICS],,[Define if atomics are supported])
+])

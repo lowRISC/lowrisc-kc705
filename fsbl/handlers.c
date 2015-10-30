@@ -1,7 +1,6 @@
 // See LICENSE for license details.
 
 #include "fsbl.h"
-#include "config.h"
 #include "vm.h"
 
 static void handle_illegal_instruction(trapframe_t* tf)

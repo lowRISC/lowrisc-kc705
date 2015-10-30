@@ -5,7 +5,6 @@
 #include "file.h"
 #include "fsbl.h"
 #include "vm.h"
-#include "driver/ff.h"
 
 #define MAX_FILES 32
 file_t files[MAX_FILES] = {[0 ... MAX_FILES-1] = {NULL,0,0}};

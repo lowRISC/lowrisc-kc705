@@ -1,7 +1,6 @@
 #ifndef _VM_H
 #define _VM_H
 
-#include "syscall.h"
 #include "file.h"
 #include <string.h>
 #include <stdint.h>

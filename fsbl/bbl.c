@@ -16,9 +16,6 @@ void run_loaded_program(struct mainvars* args)
     panic("bbl can't run user binaries; try using pk instead");
 
     supervisor_vm_init();
-#ifdef PK_ENABLE_LOGO
-    print_logo();
-#endif
     mb();
     elf_loaded = 1;
     enter_entry_point();
