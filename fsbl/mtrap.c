@@ -1,5 +1,4 @@
 #include "mtrap.h"
-#include "frontend.h"
 #include "mcall.h"
 #include "vm.h"
 #include <errno.h>

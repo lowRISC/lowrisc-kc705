@@ -1,7 +1,6 @@
 #include "vm.h"
 #include "file.h"
 #include "atomic.h"
-#include "pk.h"
 #include <stdint.h>
 #include <errno.h>
 
@@ -297,13 +296,12 @@ int do_munmap(uintptr_t addr, size_t length)
   return 0;
 }
 
-uintptr_t do_mmap(uintptr_t addr, size_t length, int prot, int flags, int fd, off_t offset)
+uintptr_t do_mmap(uintptr_t addr, size_t length, int prot, int flags, file_t* f, off_t offset)
 {
   if (!(flags & MAP_PRIVATE) || length == 0 || (offset & (RISCV_PGSIZE-1)))
     return -EINVAL;
 
-  file_t* f = NULL;
-  if (!(flags & MAP_ANONYMOUS) && (f = file_get(fd)) == NULL)
+  if (!(flags & MAP_ANONYMOUS) && f == NULL)
     return -EBADF;
 
   spinlock_lock(&vm_lock);
@@ -313,7 +311,6 @@ uintptr_t do_mmap(uintptr_t addr, size_t length, int prot, int flags, int fd, of
       current.brk_max = addr;
   spinlock_unlock(&vm_lock);
 
-  if (f) file_decref(f);
   return addr;
 }
 

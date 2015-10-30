@@ -1,7 +1,6 @@
 // See LICENSE for license details.
 
-#include "pk.h"
-#include "file.h"
+#include "fsbl.h"
 #include "vm.h"
 #include "elf.h"
 #include <stdint.h>

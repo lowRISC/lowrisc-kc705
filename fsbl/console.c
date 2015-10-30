@@ -1,10 +1,10 @@
-#include "pk.h"
-#include "file.h"
+#include "fsbl.h"
 #include "frontend.h"
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <string.h>
+#include "driver/uart.h"
 
 static int vsnprintf(char* out, size_t n, const char* s, va_list vl)
 {
@@ -90,7 +90,7 @@ static void vprintk(const char* s, va_list vl)
 {
   char out[256]; // XXX
   int res = vsnprintf(out, sizeof(out), s, vl);
-  file_write(stderr, out, res < sizeof(out) ? res : sizeof(out));
+  uart_send_buf(out, res < sizeof(out) ? res : sizeof(out));
 }
 
 void printk(const char* s, ...)
