@@ -35,6 +35,14 @@ void uart_send_string(const uint8_t *str) {
   }
 }
 
+void uart_send_buf(const uint8_t *buf, const int32_t len) {
+  int32_t i;
+  for(i=0; i<len; i++) {
+    while(! (*(uart_base_ptr + UART_LSR) & 0x40u));
+    *(uart_base_ptr + UART_THR) = *(buf + i);
+  }
+}
+
 uint8_t uart_recv() {
   // wait until RBR has data
   uint32_t status;

@@ -50,6 +50,7 @@
 extern void uart_init();
 extern void uart_send(uint8_t);
 extern void uart_send_string(const uint8_t *str);
+extern void uart_send_buf(const uint8_t *buf, const int32_t len);
 extern uint8_t uart_recv();
 
 #endif
