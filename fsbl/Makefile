@@ -15,6 +15,7 @@ TARGET = fsbl
 all: $(TARGET)
 
 junk += $(TARGET)
+
 .PHONY: all
 
 #--------------------------------------------------------------------
@@ -26,6 +27,8 @@ RISCV_PREFIX=riscv64-unknown-elf-
 RISCV_GCC = $(RISCV_PREFIX)gcc
 RISCV_GCC_OPTS = -MMD -MP -Wall -Werror -D__NO_INLINE__ -DENABLE_ATOMICS -mcmodel=medany -O2 -std=gnu99 -Wno-unused -Wno-attributes -fno-delete-null-pointer-checks  -I. -I..
 RISCV_LINK_OPTS = -nostartfiles -nostdlib -static -T fsbl.ld -L../softfloat -lsoftfloat -lgcc
+RISCV_DUMP = $(RISCV_PREFIX)objdump
+RISCV_DUMP_OPTS = -D -S -l
 
 
 #--------------------------------------------------------------------
@@ -70,7 +73,7 @@ junk += $(C_OBJS) $(S_OBJS) $(DRIVER_OBJS)
 # Building Targets
 #--------------------------------------------------------------------
 
-../softfloat/libsoftfloat.a: $(wildcard ../softfloat/*)
+../softfloat/libsoftfloat.a: $(wildcard ../softfloat/*.c) $(wildcard ../softfloat/*.h)
 	cd ../softfloat && make
 
 $(C_OBJS): %.o: %.c $(HEADERS)
@@ -84,6 +87,12 @@ $(DRIVER_OBJS): %.o:$(DRIVER_DIR)/%.c $(DRIVER_HEADERS)
 
 $(TARGET): $(C_OBJS) $(S_OBJS) $(DRIVER_OBJS) ../softfloat/libsoftfloat.a
 	$(RISCV_GCC) -o $@ $(C_OBJS) $(S_OBJS) $(DRIVER_OBJS) $(RISCV_LINK_OPTS)
+
+dump: $(TARGET).dump
+$(TARGET).dump: $(TARGET)
+	$(RISCV_DUMP) $(RISCV_DUMP_OPTS) $< > $@
+
+.PHONY: dump
 
 #--------------------------------------------------------------------
 # clean up

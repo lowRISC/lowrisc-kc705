@@ -13,7 +13,7 @@ static void enter_entry_point()
 void run_loaded_program()
 {
   if (!current.is_supervisor)
-    panic("bbl can't run user binaries; try using pk instead");
+    panic("fsbl can't run user binaries; try using pk instead");
 
     supervisor_vm_init();
     mb();

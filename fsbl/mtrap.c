@@ -2,6 +2,7 @@
 #include "mtrap.h"
 #include "mcall.h"
 #include "vm.h"
+#include "driver/uart.h"
 #include <errno.h>
 
 uintptr_t illegal_insn_trap(uintptr_t mcause, uintptr_t* regs)
@@ -63,6 +64,7 @@ void __attribute__((noreturn)) bad_trap()
 
 uintptr_t htif_interrupt(uintptr_t mcause, uintptr_t* regs)
 {
+  /*
   uintptr_t fromhost = swap_csr(mfromhost, 0);
   if (!fromhost)
     return 0;
@@ -105,8 +107,9 @@ uintptr_t htif_interrupt(uintptr_t mcause, uintptr_t* regs)
     prev = m;
     m = (void*)atomic_read(&m->sbi_private_data);
   }
-
-  panic("htif: no record");
+  */
+  panic("htif_interrupt: not-available");
+  return 0;
 }
 
 static uintptr_t mcall_hart_id()
@@ -116,6 +119,7 @@ static uintptr_t mcall_hart_id()
 
 static uintptr_t mcall_console_putchar(uint8_t ch)
 {
+  /*
   while (swap_csr(mtohost, TOHOST_CMD(1, 1, ch)) != 0);
   while (1) {
     uintptr_t fromhost = read_csr(mfromhost);
@@ -127,6 +131,8 @@ static uintptr_t mcall_console_putchar(uint8_t ch)
     write_csr(mfromhost, 0);
     break;
   }
+  */
+  uart_send(ch);
   return 0;
 }
 
@@ -144,13 +150,16 @@ static uintptr_t mcall_dev_req(sbi_device_message *m)
   if ((m->dev > 0xFFU) | (m->cmd > 0xFFU) | (m->data > 0x0000FFFFFFFFFFFFU))
     return -EINVAL;
 
+  /*
   while (swap_csr(mtohost, TOHOST_CMD(m->dev, m->cmd, m->data)) != 0)
     ;
 
   m->sbi_private_data = (uintptr_t)HLS()->device_request_queue_head;
   HLS()->device_request_queue_head = m;
   HLS()->device_request_queue_size++;
+  */
 
+  panic("dev_req: not-available");
   return 0;
 }
 
@@ -202,8 +211,9 @@ static uintptr_t mcall_clear_ipi()
 
 static uintptr_t mcall_shutdown()
 {
-  while (1)
-    write_csr(mtohost, 1);
+  //while (1)
+  //  write_csr(mtohost, 1);
+  die(0);
   return 0;
 }
 

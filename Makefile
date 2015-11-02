@@ -182,5 +182,6 @@ clean:
 cleanall: clean
 	rm -fr $(project_name)
 	cd examples && make clean
+	cd fsbl && make clean
 
 .PHONY: clean cleanall
