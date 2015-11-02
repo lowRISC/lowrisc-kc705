@@ -8,6 +8,8 @@
 #include <elf.h>
 #include <string.h>
 
+#define IS_ERR_VALUE(x) ((unsigned long)(x) >= (unsigned long)-4096)
+
 void load_elf(const char* fn, elf_info* info)
 {
   file_t* file = file_open(fn, O_RDONLY, 0);

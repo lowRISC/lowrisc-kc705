@@ -40,7 +40,7 @@ void populate_mapping(const void* start, size_t size, int prot);
 void __map_kernel_range(uintptr_t va, uintptr_t pa, size_t len, int prot);
 int __valid_user_range(uintptr_t vaddr, size_t len);
 uintptr_t __do_mmap(uintptr_t addr, size_t length, int prot, int flags, file_t* file, off_t offset);
-uintptr_t do_mmap(uintptr_t addr, size_t length, int prot, int flags, int fd, off_t offset);
+uintptr_t do_mmap(uintptr_t addr, size_t length, int prot, int flags, file_t* f, off_t offset);
 int do_munmap(uintptr_t addr, size_t length);
 uintptr_t do_mremap(uintptr_t addr, size_t old_size, size_t new_size, int flags);
 uintptr_t do_mprotect(uintptr_t addr, size_t length, int prot);

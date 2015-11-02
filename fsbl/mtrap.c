@@ -1,3 +1,4 @@
+#include "frontend.h"
 #include "mtrap.h"
 #include "mcall.h"
 #include "vm.h"

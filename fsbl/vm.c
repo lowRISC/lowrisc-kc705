@@ -1,3 +1,4 @@
+#include "fsbl.h"
 #include "vm.h"
 #include "file.h"
 #include "atomic.h"

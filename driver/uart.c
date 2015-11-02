@@ -28,14 +28,14 @@ void uart_send(uint8_t data) {
   *(uart_base_ptr + UART_THR) = data;
 }
 
-void uart_send_string(const uint8_t *str) {
+void uart_send_string(const char *str) {
   while(*str != 0) {
     while(! (*(uart_base_ptr + UART_LSR) & 0x40u));
     *(uart_base_ptr + UART_THR) = *(str++);
   }
 }
 
-void uart_send_buf(const uint8_t *buf, const int32_t len) {
+void uart_send_buf(const char *buf, const int32_t len) {
   int32_t i;
   for(i=0; i<len; i++) {
     while(! (*(uart_base_ptr + UART_LSR) & 0x40u));

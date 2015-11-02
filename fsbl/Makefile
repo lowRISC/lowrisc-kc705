@@ -21,39 +21,50 @@ junk += $(TARGET)
 # Build rules
 #--------------------------------------------------------------------
 
+DRIVER_DIR = ../driver
 RISCV_PREFIX=riscv64-unknown-elf-
 RISCV_GCC = $(RISCV_PREFIX)gcc
-RISCV_GCC_OPTS = -MMD -MP -Wall -Werror -D__NO_INLINE__ -mcmodel=medany -O2 -std=gnu99 -Wno-unused -Wno-attributes -fno-delete-null-pointer-checks  -I. -I../fsbl
+RISCV_GCC_OPTS = -MMD -MP -Wall -Werror -D__NO_INLINE__ -DENABLE_ATOMICS -mcmodel=medany -O2 -std=gnu99 -Wno-unused -Wno-attributes -fno-delete-null-pointer-checks  -I. -I..
 RISCV_LINK_OPTS = -nostartfiles -nostdlib -static -T fsbl.ld -L../softfloat -lsoftfloat -lgcc
 
 
 #--------------------------------------------------------------------
 # Objects
 #--------------------------------------------------------------------
-OBJS = \
+C_OBJS = \
 	mtrap.o \
 	minit.o \
 	emulation.o \
 	sbi_impl.o \
 	init.o \
 	file.o \
-	handlers.o \
 	frontend.o \
 	elf.o \
 	console.o \
 	vm.o \
 	string.o \
+	fsbl.o \
+
+S_OBJS = \
 	mentry.o \
-	entry.o \
-	fp_asm.o \
 	sbi_entry.o \
 	sbi.o \
-	fsbl \
+	fp_asm.o \
 
 HEADERS += \
 	$(wildcard *.h) \
 
-junk += $(OBJS)
+DRIVER_OBJS = \
+	spi.o \
+	uart.o \
+	memory.o \
+	diskio.o \
+	ff.o \
+
+DRIVER_HEADERS += \
+	$(wildcard $(DRIVER_DIR)/*.h) \
+
+junk += $(C_OBJS) $(S_OBJS) $(DRIVER_OBJS)
 
 #--------------------------------------------------------------------
 # Building Targets
@@ -62,11 +73,17 @@ junk += $(OBJS)
 ../softfloat/libsoftfloat.a: $(wildcard ../softfloat/*)
 	cd ../softfloat && make
 
-%.o: %.c $(HEADERS)
+$(C_OBJS): %.o: %.c $(HEADERS)
 	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
-$(TARGET): $(OBJS) ../softfloat/libsoftfloat.a
-	$(RISCV_LINK) -o $@ $(OBJS) $(RISCV_LINK_OPTS)
+$(S_OBJS): %.o: %.S $(HEADERS)
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+$(DRIVER_OBJS): %.o:$(DRIVER_DIR)/%.c $(DRIVER_HEADERS)
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
+
+$(TARGET): $(C_OBJS) $(S_OBJS) $(DRIVER_OBJS) ../softfloat/libsoftfloat.a
+	$(RISCV_GCC) -o $@ $(C_OBJS) $(S_OBJS) $(DRIVER_OBJS) $(RISCV_LINK_OPTS)
 
 #--------------------------------------------------------------------
 # clean up

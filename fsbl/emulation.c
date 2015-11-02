@@ -1,5 +1,5 @@
 #include "mtrap.h"
-#include "softfloat.h"
+#include "../softfloat/softfloat.h"
 #include <limits.h>
 
 DECLARE_EMULATION_FUNC(truly_illegal_insn)

@@ -28,7 +28,7 @@ ssize_t file_write(file_t* f, const void* buf, size_t n);
 ssize_t file_read(file_t* f, void* buf, size_t n);
 ssize_t file_lseek(file_t* f, size_t ptr, int dir);
 //int file_truncate(file_t* f, off_t len);
-int file_stat(const char* fn, struct stat* s);
+//int file_stat(const char* fn, struct stat* s);
 
 void file_init();
 
