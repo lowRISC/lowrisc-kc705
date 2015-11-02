@@ -1,5 +1,5 @@
 #=======================================================================
-# Shared Makefile components for all KC705 example tests
+# Makefile for all KC705 examples
 #-----------------------------------------------------------------------
 # See LICENSE for license details.
 
@@ -12,6 +12,7 @@ endif
 # Build rules
 #--------------------------------------------------------------------
 
+DRIVER_DIR = ../driver
 RISCV_PREFIX=riscv64-unknown-elf-
 RISCV_GCC = $(RISCV_PREFIX)gcc
 RISCV_DUMP = $(RISCV_PREFIX)objdump
@@ -25,33 +26,36 @@ RISCV_LINK_OPTS = -nostdlib -nostartfiles -ffast-math -lc -lgcc
 # Objects
 #--------------------------------------------------------------------
 
+default: all
 
-OBJS += \
+TARGETS = boot dram hello reset sdcard
+
+DRIVER_OBJS += \
 	$(DRIVER_DIR)/syscalls.o \
-	crt.o \
+	$(DRIVER_DIR)/spi.o \
+	$(DRIVER_DIR)/uart.o \
+	$(DRIVER_DIR)/memory.o \
+	$(DRIVER_DIR)/elf.o \
+	$(DRIVER_DIR)/diskio.o \
+	$(DRIVER_DIR)/ff.o \
 
-$(DRIVER_DIR)/syscalls.o: $(DRIVER_DIR)/syscalls.c
+HEADERS += \
+	$(wildcard $(DRIVER_DIR)/*.h) \
+
+junk += \
+	$(addsuffix .riscv, $(TARGETS)) \
+	$(addsuffix .hex, $(TARGETS)) \
+	$(addsuffix .dump, $(TARGETS)) \
+	$(DRIVER_OBJS) \
+
+#--------------------------------------------------------------------
+# Build Drivers
+#--------------------------------------------------------------------
+
+$(DRIVER_OBJS): %.o:%.c $(HEADERS)
 	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
 crt.o: $(DRIVER_DIR)/crt.S
-	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
-
-$(DRIVER_DIR)/uart.o:$(DRIVER_DIR)/uart.c $(DRIVER_DIR)/uart.h $(DRIVER_DIR)/device_map.h
-	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
-
-$(DRIVER_DIR)/spi.o:$(DRIVER_DIR)/spi.c $(DRIVER_DIR)/spi.h $(DRIVER_DIR)/device_map.h
-	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
-
-$(DRIVER_DIR)/elf.o:$(DRIVER_DIR)/elf.c $(DRIVER_DIR)/elf.h
-	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
-
-$(DRIVER_DIR)/memory.o:$(DRIVER_DIR)/memory.c $(DRIVER_DIR)/memory.h $(DRIVER_DIR)/device_map.h
-	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
-
-$(DRIVER_DIR)/diskio.o: $(DRIVER_DIR)/diskio.c $(DRIVER_DIR)/diskio.h $(DRIVER_DIR)/spi.h $(DRIVER_DIR)/device_map.h
-	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
-
-$(DRIVER_DIR)/ff.o: $(DRIVER_DIR)/ff.c $(DRIVER_DIR)/ff.h $(DRIVER_DIR)/ffconf.h $(DRIVER_DIR)/diskio.h $(DRIVER_DIR)/spi.h $(DRIVER_DIR)/device_map.h
 	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $< -o $@
 
 junk += crt.o
@@ -60,22 +64,20 @@ junk += crt.o
 # Building Targets
 #--------------------------------------------------------------------
 
-all: $(TARGET).hex
+all: $(addsuffix .hex, $(TARGETS))
 
-dump: $(TARGET).dump
+dump: $(addsuffix .dump, $(TARGETS))
 
-$(TARGET).riscv: $(OBJS)
-	$(RISCV_LINK) -o $@ $^ $(RISCV_LINK_OPTS)
+$(addsuffix .riscv, $(TARGETS)): %.riscv:%.c $(HEADERS) $(DRIVER_OBJS) crt.o $(DRIVER_DIR)/test.ld
+	$(RISCV_LINK) $(RISCV_GCC_OPTS) -o $@ $< $(DRIVER_OBJS) crt.o $(RISCV_LINK_OPTS)
 
-$(TARGET).hex: $(TARGET).riscv
+$(addsuffix .hex, $(TARGETS)): %.hex:%.riscv
 	elf2hex 16 4096 $< > $@
 
-$(TARGET).dump: $(TARGET).riscv
+$(addsuffix .dump, $(TARGETS)): %.dump:%.riscv
 	$(RISCV_DUMP) $(RISCV_DUMP_OPTS) $< > $@
 
 .PHONY: all dump
-
-junk += $(TARGET).riscv $(TARGET).hex $(TARGET).dump
 
 #--------------------------------------------------------------------
 # clean up
