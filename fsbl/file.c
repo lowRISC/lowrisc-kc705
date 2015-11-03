@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
 #include "file.h"
 #include "fsbl.h"
 #include "vm.h"
@@ -39,6 +40,7 @@ static file_t* file_get_free()
   for (file_t* f = files; f < files + MAX_FILES; f++)
     if (atomic_cas(&f->refcnt, 0, 2) == 0)
       return f;
+  panic("fail to get a free file");
   return NULL;
 }
 
@@ -51,24 +53,30 @@ void file_init()
   }
 }
 
-file_t* file_openat(int dirfd, const char* fn, int flags, int mode)
+file_t* file_openat(int dirfd, const char* fn, int flags)
 {
   file_t* f = file_get_free();
   if (f == NULL)
-    return ERR_PTR(-ENOMEM);
+    return f;
+
+  uint8_t mode = 0;
+  if((flags & O_ACCMODE) == O_RDONLY) mode = FA_READ;
+  if((flags & O_ACCMODE) == O_WRONLY) mode = FA_WRITE;
+  if((flags & O_ACCMODE) == O_RDWR)   mode = FA_READ | FA_WRITE;
 
   FRESULT rt = f_open(&f->fd, fn, mode); /* check mode */
   if (rt) {
+    panic("fail to open file %s", fn);
     file_decref(f);
-    return ERR_PTR(-ENOMEM);      /* check ERR_PTR */
+    return NULL;
   } else {
     return f;
   }
 }
 
-file_t* file_open(const char* fn, int flags, int mode)
+file_t* file_open(const char* fn, int flags)
 {
-  return file_openat(AT_FDCWD, fn, flags, mode);
+  return file_openat(AT_FDCWD, fn, flags);
 }
 
 ssize_t file_read(file_t* f, void* buf, size_t size)
@@ -87,9 +95,11 @@ ssize_t file_pread(file_t* f, void* buf, size_t size, off_t offset)
 {
   populate_mapping(buf, size, PROT_WRITE);
   long flags = spinlock_lock_irqsave(&file_lock);
-  f_lseek(&f->fd, offset);
+  FRESULT rt = f_lseek(&f->fd, offset);
+  if(rt) panic("f_lseek() failed! %d", rt);
   uint32_t rsize = 0;
   f_read(&f->fd, buf, size, &rsize);
+  if(rt) panic("f_read() failed! %d", rt);
   spinlock_unlock_irqrestore(&file_lock,flags);
   return rsize;
 }

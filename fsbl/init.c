@@ -26,17 +26,11 @@ void init_tf(trapframe_t* tf, long pc, long sp, int user64)
 
 void boot_loader()
 {
-  // set memory size
-  uintptr_t mem_mb = 1024;      /* 1GB DDR3 */
-  mem_size = mem_mb << 20;
-  if ((mem_size >> 20) < mem_mb)
-    mem_size = (typeof(mem_size))-1 & -RISCV_PGSIZE;
-
   // load program named "boot"
   long phdrs[128];
   current.phdr = (uintptr_t)phdrs;
   current.phdr_size = sizeof(phdrs);
-  load_elf("boot", &current);
+  load_elf("vmlinux", &current);
 
   run_loaded_program();
 }

@@ -6,6 +6,7 @@
 #include "uart.h"
 #include "elf.h"
 #include "memory.h"
+#include "spi.h"
 
 FATFS FatFs;   /* Work area (file system object) for logical drive */
 
@@ -35,7 +36,10 @@ int main (void)
   uart_init();
 
   /* Register work area to the default drive */
-  f_mount(&FatFs, "", 0);
+  if(f_mount(&FatFs, "", 1)) {
+    printf("Fail to mount SD driver!\n");
+    return 1;
+  }
 
   /* Open a text file */
   printf("load boot into memory\n");
@@ -61,7 +65,16 @@ int main (void)
     printf("elf read failed with code %0d", br);
 
   /* Close the file */
-  f_close(&fil);
+  if(f_close(&fil)) {
+    printf("fail to close file!");
+    return 1;
+  }
+  if(f_mount(NULL, "", 1)) {         /* unmount it */
+    printf("fail to umount disk!");
+    return 1;
+  }
+
+  spi_disable();
 
   printf("read the loaded program:\n");
 
@@ -77,7 +90,7 @@ int main (void)
   do {
     printf("%16lx: %16lx%16lx\n", memory, *(memory+ 1), *memory);
     memory += 2;
-  } while(memory <= get_ddr_base() + 0x200);
+  } while(memory <= get_ddr_base() + 0x20);
 
   // map DDR3 to address 0
   syscall(SYS_set_membase, 0x0, 0x3fffffff, 0x40000000); /* map DDR to 0x0 */

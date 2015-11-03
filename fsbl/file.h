@@ -20,8 +20,8 @@ typedef struct file
 
 void file_incref(file_t* f);
 void file_decref(file_t* f);
-file_t* file_open(const char* fn, int flags, int mode);
-//file_t* file_openat(int dirfd, const char* fn, int flags, int mode);
+file_t* file_open(const char* fn, int flags);
+//file_t* file_openat(int dirfd, const char* fn, int flags);
 ssize_t file_pwrite(file_t* f, const void* buf, size_t n, off_t off);
 ssize_t file_pread(file_t* f, void* buf, size_t n, off_t off);
 ssize_t file_write(file_t* f, const void* buf, size_t n);

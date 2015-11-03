@@ -92,6 +92,10 @@ dump: $(TARGET).dump
 $(TARGET).dump: $(TARGET)
 	$(RISCV_DUMP) $(RISCV_DUMP_OPTS) $< > $@
 
+hex: $(TARGET).hex
+$(TARGET).hex: $(TARGET)
+	elf2hex 16 32768 $< > $@
+
 .PHONY: dump
 
 #--------------------------------------------------------------------

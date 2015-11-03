@@ -20,7 +20,10 @@ int main (void)
   uart_init();
 
   /* Register work area to the default drive */
-  f_mount(&FatFs, "", 0);
+  if(f_mount(&FatFs, "", 1)) {
+    printf("Fail to mount SD driver!\n");
+    return 1;
+  }
 
   /* Open a text file */
   fr = f_open(&fil, "test.txt", FA_READ);
@@ -32,15 +35,28 @@ int main (void)
   }
 
   /* Read all lines and display it */
+  uint32_t fsize = 0;
   for (;;) {
     fr = f_read(&fil, buffer, sizeof(buffer), &br);  /* Read a chunk of source file */
     if (fr || br == 0) break; /* error or eof */
+    buffer[br] = 0;
     printf("%s", buffer);
+    fsize += br;
   }
 
+  printf("file size %d\n", fsize);
+
   /* Close the file */
-  f_close(&fil);
-  printf("test.txt closed\n");
+  if(f_close(&fil)) {
+    printf("fail to close file!");
+    return 1;
+  }
+  if(f_mount(NULL, "", 1)) {         /* unmount it */
+    printf("fail to umount disk!");
+    return 1;
+  }
+
+  printf("test.txt closed.\n");
 
   return 0;
 }

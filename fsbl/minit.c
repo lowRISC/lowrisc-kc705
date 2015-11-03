@@ -1,9 +1,11 @@
 #include "fsbl.h"
 #include "vm.h"
 #include "mtrap.h"
+#include "driver/uart.h"
+#include "driver/ff.h"
 
 uintptr_t mem_size;
-uint32_t num_harts;
+uint32_t num_harts = 1;
 uint32_t num_harts_booted = 1;
 
 static void mstatus_init()
@@ -32,6 +34,12 @@ static void mstatus_init()
 
 static void memory_init()
 {
+  // set memory size
+  uintptr_t mem_mb = 1024;      /* 1GB DDR3 */
+  mem_size = mem_mb << 20;
+  if ((mem_size >> 20) < mem_mb)
+    mem_size = (typeof(mem_size))-1 & -RISCV_PGSIZE;
+
   if (mem_size == 0)
     panic("could not determine memory capacity");
 
@@ -63,9 +71,13 @@ static void hls_init(uint32_t hart_id)
 
 static void init_first_hart()
 {
+  uart_send_string("file_init()\n");
   file_init();
+  uart_send_string("memory_init()\n");
   memory_init();
+  uart_send_string("vm_init()\n");
   vm_init();
+  uart_send_string("boot_loader()\n");
   boot_loader();
 }
 
@@ -86,14 +98,24 @@ static void init_other_hart()
   boot_other_hart();
 }
 
+FATFS FatFs;   /* Work area (file system object) for logical drive */
+
 void machine_init(uint32_t hart_id)
 {
+  uart_init();
+  /* Register work area to the default drive */
+  f_mount(&FatFs, "", 0);
+
+  uart_send_string("hls_init()\n");
   hls_init(hart_id);
+  uart_send_string("mstatus_init()\n");
   mstatus_init();
+  uart_send_string("fp_init()\n");
   fp_init();
 
-  if (hart_id == 0)
+  if (hart_id == 0) {
+    uart_send_string("init_first_hart()\n");
     init_first_hart();
-  else
+  } else
     init_other_hart();
 }
