@@ -32,5 +32,6 @@ void boot_loader()
   current.phdr_size = sizeof(phdrs);
   load_elf("vmlinux", &current);
 
+  printk("run_loaded_program()\n");
   run_loaded_program();
 }

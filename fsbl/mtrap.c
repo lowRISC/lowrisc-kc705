@@ -140,9 +140,45 @@ static uintptr_t mcall_console_putchar(uint8_t ch)
   char buf[128], *p = buf; snprintf(buf, sizeof(buf), str, __VA_ARGS__); \
   while (*p) mcall_console_putchar(*p++); })
 
+static void handle_identify(uint64_t payload, const char *dev_name) {
+  size_t what = payload % HTIF_MAX_CMD;
+  uintptr_t addr = payload / HTIF_MAX_CMD;
+  if(addr % HTIF_MAX_ID != 0)
+    panic("address for device ID not aligned!");
+  if(strlen(dev_name) > HTIF_MAX_ID)
+    panic("device name too long!");
+  
+  char * id = (char *)addr;
+  
+  if (what == HTIF_CMD_IDENTIFY)
+  {
+    strcpy(id, dev_name);
+  } else {
+    strcpy(id, "");
+  }
+}
+
+static void mcall_respond(sbi_device_message *m, uint64_t resp) {
+
+  // enqueue to response queue
+  m->sbi_private_data = 0;
+  if (HLS()->device_response_queue_tail)
+    HLS()->device_response_queue_tail->sbi_private_data = (uintptr_t)m;
+  else
+    HLS()->device_response_queue_head = m;
+  HLS()->device_response_queue_tail = m;
+
+  // set response
+  m->data = resp;
+
+  // signal software interrupt
+  set_csr(mip, MIP_SSIP);
+}
+
 static uintptr_t mcall_dev_req(sbi_device_message *m)
 {
-  //printm("req %d %p\n", HLS()->device_request_queue_size, m);
+  //printm("req %d %p\n", (int)HLS()->device_request_queue_size, m);
+  printk("mcall_dev_req() %lx %lx %lx\n", m->dev, m->cmd, m->data);
   if (!supervisor_paddr_valid(m, sizeof(*m))
       && EXTRACT_FIELD(read_csr(mstatus), MSTATUS_PRV1) != PRV_M)
     return -EFAULT;
@@ -150,23 +186,55 @@ static uintptr_t mcall_dev_req(sbi_device_message *m)
   if ((m->dev > 0xFFU) | (m->cmd > 0xFFU) | (m->data > 0x0000FFFFFFFFFFFFU))
     return -EINVAL;
 
-  /*
-  while (swap_csr(mtohost, TOHOST_CMD(m->dev, m->cmd, m->data)) != 0)
-    ;
+  switch(m->dev) {
+  case 0:                       /* bcd */
+    {
+      switch(m->cmd) {
+      case HTIF_CMD_IDENTIFY:
+        {
+          handle_identify(m->data, "bcd");
+          mcall_respond(m, 1);
+          break;
+        }
+      default:
+        panic("bcd request with non-identity command!");
+      }
+      break;
+    }
+  case 1:                       /* disk */
+    {
+      switch(m->cmd) {
+      case HTIF_CMD_IDENTIFY:
+        {
+          handle_identify(m->data, "disk");
+          mcall_respond(m, 1);
+          break;
+        }
+      default:
+        panic("disk request with non-identity command!");
+      }
+      break;
+    }
+  default:                      /* none */
+    {
+      switch(m->cmd) {
+      case HTIF_CMD_IDENTIFY:
+        {
+          handle_identify(m->data, "");
+          mcall_respond(m, 1);
+          break;
+        }
+      default:
+        panic("unknown device request with non-identity command!");
+      }
+    }
+  }
 
-  m->sbi_private_data = (uintptr_t)HLS()->device_request_queue_head;
-  HLS()->device_request_queue_head = m;
-  HLS()->device_request_queue_size++;
-  */
-
-  panic("dev_req: not-available");
   return 0;
 }
 
 static uintptr_t mcall_dev_resp()
 {
-  htif_interrupt(0, 0);
-
   sbi_device_message* m = HLS()->device_response_queue_head;
   if (m) {
     //printm("resp %p\n", m);
@@ -181,6 +249,7 @@ static uintptr_t mcall_dev_resp()
       if (HLS()->ipi_pending)
         set_csr(mip, MIP_SSIP);
     }
+    printk("mcall_dev_resp() %lx %lx %lx\n", m->dev, m->cmd, m->data);
   }
   return (uintptr_t)m;
 }
