@@ -17,8 +17,8 @@ void uart_init() {
   // 8-bit data, 1-bit odd parity
   *(uart_base_ptr + UART_LCR) = 0x000Bu;
 
-  // Disable all interrupt, use polling
-  *(uart_base_ptr + UART_IER) = 0x0000u;
+  // Enable read IRQ
+  *(uart_base_ptr + UART_IER) = 0x0001u;
 
 }
 
@@ -45,9 +45,28 @@ void uart_send_buf(const char *buf, const int32_t len) {
 
 uint8_t uart_recv() {
   // wait until RBR has data
-  uint32_t status;
-  while(! (*(uart_base_ptr + UART_LSR) & 0x01u)) { }
+  while(! (*(uart_base_ptr + UART_LSR) & 0x01u));
 
   return *(uart_base_ptr + UART_RBR);
 
+}
+
+// IRQ triggered read
+uint8_t uart_read_irq() {
+  return *(uart_base_ptr + UART_RBR);
+}
+
+// check uart IRQ for read
+uint8_t uart_check_read_irq() {
+  return (*(uart_base_ptr + UART_LSR) & 0x01u);
+}
+
+// enable uart read IRQ
+void uart_enable_read_irq() {
+  *(uart_base_ptr + UART_IER) = 0x0001u;
+}
+
+// disable uart read IRQ
+void uart_disable_read_irq() {
+  *(uart_base_ptr + UART_IER) = 0x0000u;
 }

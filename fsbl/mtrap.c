@@ -64,25 +64,27 @@ void __attribute__((noreturn)) bad_trap()
 
 uintptr_t htif_interrupt(uintptr_t mcause, uintptr_t* regs)
 {
-  /*
-  uintptr_t fromhost = swap_csr(mfromhost, 0);
-  if (!fromhost)
-    return 0;
+  panic("htif_interrupt(): no record");
+}
 
-  uintptr_t dev = FROMHOST_DEV(fromhost);
-  uintptr_t cmd = FROMHOST_CMD(fromhost);
-  uintptr_t data = FROMHOST_DATA(fromhost);
+uintptr_t io_irq_service(uintptr_t mcause, uintptr_t* regs)
+{
+  // right now, it must be uart read
+  if(!uart_check_read_irq())
+    panic("io_irq_service() with no uart recv buf available!");
 
+  // get the message from request queue
   sbi_device_message* m = HLS()->device_request_queue_head;
   sbi_device_message* prev = NULL;
   for (size_t i = 0, n = HLS()->device_request_queue_size; i < n; i++) {
     if (!supervisor_paddr_valid(m, sizeof(*m))
         && EXTRACT_FIELD(read_csr(mstatus), MSTATUS_PRV1) != PRV_M)
-      panic("htif: page fault");
+      panic("io_irq_service(): page fault");
 
     sbi_device_message* next = (void*)m->sbi_private_data;
-    if (m->dev == dev && m->cmd == cmd) {
-      m->data = data;
+    if (m->dev == 0 && m->cmd == HTIF_CMD_READ) {
+      uint8_t ch = uart_read_irq();
+      m->data = 0x100 | ch;
 
       // dequeue from request queue
       if (prev)
@@ -107,9 +109,8 @@ uintptr_t htif_interrupt(uintptr_t mcause, uintptr_t* regs)
     prev = m;
     m = (void*)atomic_read(&m->sbi_private_data);
   }
-  */
-  panic("htif_interrupt: not-available");
-  return 0;
+
+  panic("io_irq_service(): no record");
 }
 
 static uintptr_t mcall_hart_id()
@@ -119,19 +120,6 @@ static uintptr_t mcall_hart_id()
 
 static uintptr_t mcall_console_putchar(uint8_t ch)
 {
-  /*
-  while (swap_csr(mtohost, TOHOST_CMD(1, 1, ch)) != 0);
-  while (1) {
-    uintptr_t fromhost = read_csr(mfromhost);
-    if (FROMHOST_DEV(fromhost) != 1 || FROMHOST_CMD(fromhost) != 1) {
-      if (fromhost)
-        htif_interrupt(0, 0);
-      continue;
-    }
-    write_csr(mfromhost, 0);
-    break;
-  }
-  */
   uart_send(ch);
   return 0;
 }
@@ -194,6 +182,22 @@ static uintptr_t mcall_dev_req(sbi_device_message *m)
         {
           handle_identify(m->data, "bcd");
           mcall_respond(m, 1);
+          break;
+        }
+      case HTIF_CMD_READ:       /* uart read */
+        {
+          write_csr(0x7c0, 0x01); /* enable irq0 */
+
+          // store the message in request queue
+          m->sbi_private_data = (uintptr_t)HLS()->device_request_queue_head;
+          HLS()->device_request_queue_head = m;
+          HLS()->device_request_queue_size++;
+          break;
+        }
+      case HTIF_CMD_WRITE:      /* uart write */
+        {
+          uart_send(m->data);
+          mcall_respond(m, 0x100|(uint8_t)m->data);
           break;
         }
       default:

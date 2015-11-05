@@ -258,4 +258,6 @@ typedef struct {
 #define HTIF_MAX_CMD        (256)
 #define HTIF_MAX_ID         (64)
 
+#define IRQ_IO 4
+
 #endif

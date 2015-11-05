@@ -21,7 +21,8 @@ trap_table:
   .word htif_interrupt
 #define TRAP_FROM_MACHINE_MODE_VECTOR 13
   .word trap_from_machine_mode
-  .word bad_trap
+#define IO_INTERRUPT_VECTOR 14
+  .word io_irq_service
   .word bad_trap
 
 #define HANDLE_USER_TRAP_IN_MACHINE_MODE 0       \
@@ -232,8 +233,15 @@ mentry:
 
   # See if this is an HTIF interrupt; if so, handle it in machine mode.
   li a1, IRQ_HOST * 2
-  bne a0, a1, .Lbad_trap
+  bne a0, a1, 1f
   li a0, HTIF_INTERRUPT_VECTOR
+  j .Lhandle_trap_in_machine_mode
+
+1:
+  # See if this is a peripheral IRQ; if so, handle it in machine mode.
+  li a1, IRQ_IO * 2
+  bne a0, a1, .Lbad_trap
+  li a0, IO_INTERRUPT_VECTOR
 
 .Lhandle_trap_in_machine_mode:
   # Preserve the registers.  Compute the address of the trap handler.
