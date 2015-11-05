@@ -7,9 +7,11 @@ set mem_data_width {128}
 set axi_id_width {9}
 
 set origin_dir "."
+set base_dir "../../.."
+set common_dir "../../common"
+
 set project_name [lindex $argv 0]
 set CONFIG [lindex $argv 1]
-set common_dir "../../common"
 
 # Set the directory path for the original project from where this script was exported
 set orig_proj_dir [file normalize $origin_dir/$project_name]
@@ -34,21 +36,20 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 # Set 'sources_1' fileset object
 set files [list \
                [file normalize $origin_dir/generated-src/Top.$CONFIG.v] \
-               [file normalize $origin_dir/../../../vsrc/chip_top.sv] \
-               [file normalize $origin_dir/../../../vsrc/axi_bram_ctrl_top.sv] \
-               [file normalize $origin_dir/../../../socip/nasti/channel.sv] \
-               [file normalize $origin_dir/../../../socip/nasti/lite_nasti_reader.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/lite_nasti_writer.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/nasti_buf.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/nasti_combiner.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/nasti_crossbar.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/nasti_demux.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/nasti_lite_bridge.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/nasti_lite_reader.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/nasti_lite_writer.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/nasti_mux.sv ] \
-               [file normalize $origin_dir/../../../socip/nasti/nasti_slicer.sv ] \
-               [file normalize $origin_dir/../../../socip/util/arbiter.sv ] \
+               [file normalize $base_dir/src/main/verilog/chip_top.sv] \
+               [file normalize $base_dir/socip/nasti/channel.sv] \
+               [file normalize $base_dir/socip/nasti/lite_nasti_reader.sv ] \
+               [file normalize $base_dir/socip/nasti/lite_nasti_writer.sv ] \
+               [file normalize $base_dir/socip/nasti/nasti_buf.sv ] \
+               [file normalize $base_dir/socip/nasti/nasti_combiner.sv ] \
+               [file normalize $base_dir/socip/nasti/nasti_crossbar.sv ] \
+               [file normalize $base_dir/socip/nasti/nasti_demux.sv ] \
+               [file normalize $base_dir/socip/nasti/nasti_lite_bridge.sv ] \
+               [file normalize $base_dir/socip/nasti/nasti_lite_reader.sv ] \
+               [file normalize $base_dir/socip/nasti/nasti_lite_writer.sv ] \
+               [file normalize $base_dir/socip/nasti/nasti_mux.sv ] \
+               [file normalize $base_dir/socip/nasti/nasti_slicer.sv ] \
+               [file normalize $base_dir/socip/util/arbiter.sv ] \
               ]
 add_files -norecurse -fileset [get_filesets sources_1] $files
 
@@ -140,9 +141,9 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 # Set 'sim_1' fileset object
 set obj [get_filesets sim_1]
 set files [list \
-               [file normalize $origin_dir/../../../vsrc/chip_top_tb.sv] \
-               [file normalize $origin_dir/../../../vsrc/host_behav.sv] \
-               [file normalize $origin_dir/../../../vsrc/nasti_ram_behav.sv] \
+               [file normalize $base_dir/src/test/verilog/chip_top_tb.sv] \
+               [file normalize $base_dir/src/test/verilog/host_behav.sv] \
+               [file normalize $base_dir/src/test/verilog/nasti_ram_behav.sv] \
                [file normalize $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0/example_design/sim/ddr3_model.sv] \
               ]
 add_files -norecurse -fileset $obj $files
