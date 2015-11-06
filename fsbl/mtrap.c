@@ -3,7 +3,9 @@
 #include "mcall.h"
 #include "vm.h"
 #include "driver/uart.h"
+#include "driver/ff.h"
 #include <errno.h>
+#include <fcntl.h>
 
 uintptr_t illegal_insn_trap(uintptr_t mcause, uintptr_t* regs)
 {
@@ -163,10 +165,20 @@ static void mcall_respond(sbi_device_message *m, uint64_t resp) {
   set_csr(mip, MIP_SSIP);
 }
 
+const char *ramdisk_fn = "root.bin";
+static file_t *ramdisk;
+
+typedef struct
+{
+  uint64_t addr;
+  uint64_t offset;
+  uint64_t size;
+  uint64_t tag;
+} disk_request_t;
+
 static uintptr_t mcall_dev_req(sbi_device_message *m)
 {
-  //printm("req %d %p\n", (int)HLS()->device_request_queue_size, m);
-  printk("mcall_dev_req() %lx %lx %lx\n", m->dev, m->cmd, m->data);
+  //printk("mcall_dev_req() %lx %lx %lx\n", m->dev, m->cmd, m->data);
   if (!supervisor_paddr_valid(m, sizeof(*m))
       && EXTRACT_FIELD(read_csr(mstatus), MSTATUS_PRV1) != PRV_M)
     return -EFAULT;
@@ -201,7 +213,7 @@ static uintptr_t mcall_dev_req(sbi_device_message *m)
           break;
         }
       default:
-        panic("bcd request with non-identity command!");
+        panic("bcd request with not supported command %d!", m->cmd);
       }
       break;
     }
@@ -210,12 +222,48 @@ static uintptr_t mcall_dev_req(sbi_device_message *m)
       switch(m->cmd) {
       case HTIF_CMD_IDENTIFY:
         {
-          handle_identify(m->data, "disk");
+          FILINFO fno;          /* file info */
+          if(f_stat(ramdisk_fn, &fno)) {
+            handle_identify(m->data, ""); /* error, cannot find the ramdisk root.bin */
+            mcall_respond(m, 1);
+            break;
+          }
+          
+          // open the file
+          ramdisk = file_open(ramdisk_fn, O_RDWR);
+          if(ramdisk == NULL) {
+            handle_identify(m->data, ""); /* error, cannot open root.bin for read and write*/
+            mcall_respond(m, 1);
+            break;
+          }
+
+          // get file size
+          char buf[HTIF_MAX_ID];
+          snprintf(buf, sizeof(buf), "disk size=%d", fno.fsize);
+          handle_identify(m->data, buf);
           mcall_respond(m, 1);
           break;
         }
+      case HTIF_CMD_READ:       /* disk read */
+        {
+          disk_request_t *req = (disk_request_t *)m->data;
+          if(file_pread(ramdisk, (void *)req->addr, req->size, req->offset) != req->size) {
+            panic("disk cannot read %d bytes @%d!", req->size, req->offset);
+          }
+          mcall_respond(m, req->tag);
+          break;
+        }
+      case HTIF_CMD_WRITE:       /* disk write */
+        {
+          disk_request_t *req = (disk_request_t *)m->data;
+          if(file_pwrite(ramdisk, (const void *)req->addr, req->size, req->offset) != req->size) {
+            panic("disk cannot write %d bytes @%d!", req->size, req->offset);
+          }
+          mcall_respond(m, req->tag);
+          break;
+        }
       default:
-        panic("disk request with non-identity command!");
+        panic("bcd request with not supported command %d!", m->cmd);
       }
       break;
     }
@@ -229,7 +277,7 @@ static uintptr_t mcall_dev_req(sbi_device_message *m)
           break;
         }
       default:
-        panic("unknown device request with non-identity command!");
+        panic("unknown device request with non-identity command %d!", m->cmd);
       }
     }
   }
@@ -253,7 +301,7 @@ static uintptr_t mcall_dev_resp()
       if (HLS()->ipi_pending)
         set_csr(mip, MIP_SSIP);
     }
-    printk("mcall_dev_resp() %lx %lx %lx\n", m->dev, m->cmd, m->data);
+    //printk("mcall_dev_resp() %lx %lx %lx\n", m->dev, m->cmd, m->data);
   }
   return (uintptr_t)m;
 }

@@ -35,6 +35,8 @@ int main (void)
 
   uart_init();
 
+  printf("lowRISC boot program\n=====================================\n");
+
   /* Register work area to the default drive */
   if(f_mount(&FatFs, "", 1)) {
     printf("Fail to mount SD driver!\n");
@@ -42,10 +44,10 @@ int main (void)
   }
 
   /* Open a text file */
-  printf("load boot into memory\n");
+  printf("Load boot into memory\n");
   fr = f_open(&fil, "boot", FA_READ);
   if (fr) {
-    printf("failed to open boot!\n");
+    printf("Failed to open boot!\n");
     return (int)fr;
   }
 
@@ -57,10 +59,10 @@ int main (void)
     buf += br;
   } while(!(fr || br == 0));
 
-  printf("load %0x bytes to memory\n.", fil.fsize);
+  printf("Load %0x bytes to memory.\n", fil.fsize);
 
   /* read elf */
-  printf("read boot and load elf to DDR memory\n");
+  printf("Read boot and load elf to DDR memory\n");
   if(br = load_elf(memory_base, boot_file_buf, fil.fsize))
     printf("elf read failed with code %0d", br);
 
@@ -76,8 +78,6 @@ int main (void)
 
   spi_disable();
 
-  printf("read the loaded program:\n");
-
   // remap DDR3 to memory space
   syscall(SYS_set_membase, 0x0, 0x7fffffff, 0x0); /* BRAM, 0x00000000 - 0x3fffffff */
   syscall(SYS_set_membase+5, 0, 0, 0);            /* update memory space */
@@ -86,12 +86,14 @@ int main (void)
   syscall(SYS_set_iobase+1, 0, 0, 0);                 /* clear prevvious mapping */
   syscall(SYS_set_iobase+5, 0, 0, 0);                 /* update io space */
 
-  uint64_t *memory = (uint64_t *)memory_base;
-  do {
-    printf("%16lx: %16lx%16lx\n", memory, *(memory+ 1), *memory);
-    memory += 2;
-  } while(memory <= get_ddr_base() + 0x20);
+  //printf("Read the loaded program:\n");
+  //uint64_t *memory = (uint64_t *)memory_base;
+  //do {
+  //  printf("%16lx: %16lx%16lx\n", memory, *(memory+ 1), *memory);
+  //  memory += 2;
+  //} while(memory <= get_ddr_base() + 0x20);
 
+  printf("Boot the loaded program...\n");
   // map DDR3 to address 0
   syscall(SYS_set_membase, 0x0, 0x3fffffff, 0x40000000); /* map DDR to 0x0 */
   syscall(SYS_soft_reset, 0, 0, 0);                      /* soft reset */
