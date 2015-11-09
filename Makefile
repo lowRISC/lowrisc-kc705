@@ -35,7 +35,7 @@ verilog_lowrisc = \
 
 verilog_srcs = \
 	$(verilog_lowrisc) \
-	$(base_dir)/vsrc/chip_top.sv \
+	$(base_dir)/src/main/verilog/chip_top.sv \
 	$(base_dir)/socip/nasti/channel.sv \
 	$(base_dir)/socip/nasti/lite_nasti_reader.sv \
 	$(base_dir)/socip/nasti/lite_nasti_writer.sv \
@@ -49,24 +49,24 @@ verilog_srcs = \
 	$(base_dir)/socip/nasti/nasti_mux.sv \
 	$(base_dir)/socip/nasti/nasti_slicer.sv \
 	$(base_dir)/socip/util/arbiter.sv \
-	$(base_dir)/vsrc/config.vh \
+	$(base_dir)/src/main/verilog/config.vh \
 
 boot_mem = src/boot.mem
 
 testbench_srcs = \
-	$(base_dir)/vsrc/chip_top_tb.sv \
-	$(base_dir)/vsrc/host_behav.sv \
-	$(base_dir)/vsrc/nasti_ram_behav.sv \
+	$(base_dir)/src/test/verilog/chip_top_tb.sv \
+	$(base_dir)/src/test/verilog/host_behav.sv \
+	$(base_dir)/src/test/verilog/nasti_ram_behav.sv \
 
 dpi_srcs = \
-	$(base_dir)/csrc/common/globals.cpp \
-	$(base_dir)/csrc/common/dpi_ram_behav.cpp \
-	$(base_dir)/csrc/common/dpi_host_behav.cpp \
+	$(base_dir)/src/test/cxx/common/globals.cpp \
+	$(base_dir)/src/test/cxx/common/dpi_ram_behav.cpp \
+	$(base_dir)/src/test/cxx/common/dpi_host_behav.cpp \
 
 dpi_headers = \
-	$(base_dir)/csrc/common/globals.h \
-	$(base_dir)/csrc/common/dpi_ram_behav.h \
-	$(base_dir)/csrc/common/dpi_host_behav.h \
+	$(base_dir)/src/test/cxx/common/globals.h \
+	$(base_dir)/src/test/cxx/common/dpi_ram_behav.h \
+	$(base_dir)/src/test/cxx/common/dpi_host_behav.h \
 
 #--------------------------------------------------------------------
 # Build Verilog
@@ -163,21 +163,14 @@ $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit: $(boot_mem) src/bo
 #--------------------------------------------------------------------
 # Load examples
 #--------------------------------------------------------------------
-test-hello:
-	cd examples/hello && make
-	cp examples/hello/hello.hex $(boot_mem) && make bit-update
 
-test-boot:
-	cd examples/boot && make
-	cp examples/boot/boot.hex $(boot_mem) && make bit-update
+EXAMPLES = hello boot dram sdcard
 
-test-dram:
-	cd examples/dram && make
-	cp examples/dram/dram.hex $(boot_mem) && make bit-update
+$(EXAMPLES):
+	cd examples && make
+	cp examples/$@.hex $(boot_mem) && make bit-update
 
-test-sdcard:
-	cd examples/sdcard && make
-	cp examples/sdcard/sdcard.hex $(boot_mem) && make bit-update
+.PHONY: $(EXAMPLES)
 
 #--------------------------------------------------------------------
 # Clean up
@@ -188,5 +181,7 @@ clean:
 
 cleanall: clean
 	rm -fr $(project_name)
+	cd examples && make clean
+	cd fsbl && make clean
 
 .PHONY: clean cleanall
