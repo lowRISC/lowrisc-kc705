@@ -234,13 +234,14 @@ int xmit_datablock (
   xchg_spi(token);                    /* Xmit data token */
   if (token != 0xFD) {    /* Is data token */
     xmit_spi_multi(buff, 512);      /* Xmit the data block to the MMC */
-    xchg_spi(0xFF);                 /* CRC (Dummy) */
-    xchg_spi(0xFF);
+    while(xchg_spi(0xFF) == 0x00);  /* CRC (Dummy) */
+    while(xchg_spi(0xFF) == 0x00);  /* CRC (Dummy) */
     resp = xchg_spi(0xFF);          /* Reveive data response */
     if ((resp & 0x1F) != 0x05)      /* If not accepted, return with error */
       return 0;
   }
 
+  wait_ready(500);
   return 1;
 }
 #endif

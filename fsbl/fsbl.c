@@ -15,11 +15,9 @@ void run_loaded_program()
   if (!current.is_supervisor)
     panic("fsbl can't run user binaries; try using pk instead");
 
-  printk("supervisor_vm_init()\n");
   supervisor_vm_init();
   mb();
   elf_loaded = 1;
-  printk("enter_entry_point()\n");
   enter_entry_point();
 }
 

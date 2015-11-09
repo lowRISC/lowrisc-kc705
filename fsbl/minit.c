@@ -71,13 +71,9 @@ static void hls_init(uint32_t hart_id)
 
 static void init_first_hart()
 {
-  printk("file_init()\n");
   file_init();
-  printk("memory_init()\n");
   memory_init();
-  printk("vm_init()\n");
   vm_init();
-  printk("boot_loader()\n");
   boot_loader();
 }
 
@@ -106,15 +102,11 @@ void machine_init(uint32_t hart_id)
   /* Register work area to the default drive */
   f_mount(&FatFs, "", 0);
 
-  printk("hls_init()\n");
   hls_init(hart_id);
-  printk("mstatus_init()\n");
   mstatus_init();
-  printk("fp_init()\n");
   fp_init();
 
   if (hart_id == 0) {
-    printk("init_first_hart()\n");
     init_first_hart();
   } else
     init_other_hart();

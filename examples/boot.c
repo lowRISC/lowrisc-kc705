@@ -86,13 +86,6 @@ int main (void)
   syscall(SYS_set_iobase+1, 0, 0, 0);                 /* clear prevvious mapping */
   syscall(SYS_set_iobase+5, 0, 0, 0);                 /* update io space */
 
-  //printf("Read the loaded program:\n");
-  //uint64_t *memory = (uint64_t *)memory_base;
-  //do {
-  //  printf("%16lx: %16lx%16lx\n", memory, *(memory+ 1), *memory);
-  //  memory += 2;
-  //} while(memory <= get_ddr_base() + 0x20);
-
   printf("Boot the loaded program...\n");
   // map DDR3 to address 0
   syscall(SYS_set_membase, 0x0, 0x3fffffff, 0x40000000); /* map DDR to 0x0 */
