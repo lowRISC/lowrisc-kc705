@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include "file.h"
-#include "fsbl.h"
+#include "bbl.h"
 #include "vm.h"
 
 #define MAX_FILES 32

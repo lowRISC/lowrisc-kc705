@@ -5,10 +5,10 @@ if [ $# != 1 ] ; then
     echo "preload_image /PATH/TO/SD/"
 else
     echo "====================================="
-    echo "compile and copy fsbl"
+    echo "compile and copy bbl"
     echo "====================================="
-    make fsbl
-    mv fsbl/fsbl $1boot
+    make bbl
+    mv bbl/bbl $1boot
     echo "====================================="
     echo "download and copy Linux kernel"
     echo "====================================="

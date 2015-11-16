@@ -1,4 +1,4 @@
-#include "fsbl.h"
+#include "bbl.h"
 #include "vm.h"
 
 volatile int elf_loaded;
@@ -13,7 +13,7 @@ static void enter_entry_point()
 void run_loaded_program()
 {
   if (!current.is_supervisor)
-    panic("fsbl can't run user binaries; try using pk instead");
+    panic("bbl can't run user binaries; try using pk instead");
 
   supervisor_vm_init();
   mb();

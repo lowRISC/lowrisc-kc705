@@ -25,7 +25,7 @@ RISCV_PREFIX=riscv64-unknown-elf-
 RISCV_GCC = $(RISCV_PREFIX)gcc
 RISCV_RANLIB = $(RISCV_PREFIX)ranlib
 RISCV_AR = $(RISCV_PREFIX)ar
-RISCV_GCC_OPTS = -MMD -MP -Wall -Werror -D__NO_INLINE__ -mcmodel=medany -O2 -std=gnu99 -Wno-unused -Wno-attributes -fno-delete-null-pointer-checks  -I. -I../fsbl
+RISCV_GCC_OPTS = -MMD -MP -Wall -Werror -D__NO_INLINE__ -mcmodel=medany -O2 -std=gnu99 -Wno-unused -Wno-attributes -fno-delete-null-pointer-checks  -I. -I../bbl
 
 #--------------------------------------------------------------------
 # Objects
@@ -140,7 +140,7 @@ OBJS += \
 
 HEADERS += \
 	$(wildcard *.h) \
-	$(wildcard ../fsbl/*.h) \
+	$(wildcard ../bbl/*.h) \
 
 junk += $(OBJS) $(patsubst %.o, %.d, $(OBJS))
 

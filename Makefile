@@ -173,14 +173,14 @@ $(EXAMPLES):
 .PHONY: $(EXAMPLES)
 
 #--------------------------------------------------------------------
-# FSBL
+# BBL
 #--------------------------------------------------------------------
 
-fsbl: fsbl/fsbl
-fsbl/fsbl:
-	cd fsbl && make
+bbl: bbl/bbl
+bbl/bbl:
+	cd bbl && make
 
-.PHONY: fsbl
+.PHONY: bbl
 
 #--------------------------------------------------------------------
 # Clean up
@@ -192,6 +192,6 @@ clean:
 cleanall: clean
 	rm -fr $(project_name)
 	cd examples && make clean
-	cd fsbl && make clean
+	cd bbl && make clean
 
 .PHONY: clean cleanall

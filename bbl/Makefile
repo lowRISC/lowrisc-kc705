@@ -1,5 +1,5 @@
 #=======================================================================
-# Makefile for Fisr Stage Bootloader (FSBL)
+# Makefile for Berkeley bootloader (BBL)
 #-----------------------------------------------------------------------
 # See LICENSE for license details.
 
@@ -10,11 +10,11 @@ endif
 
 default: all
 
-TARGET = fsbl
+TARGET = bbl
 
 all: $(TARGET)
 
-junk += $(TARGET)
+junk += $(TARGET) $(TARGET).hex
 
 .PHONY: all
 
@@ -26,7 +26,7 @@ DRIVER_DIR = ../driver
 RISCV_PREFIX=riscv64-unknown-elf-
 RISCV_GCC = $(RISCV_PREFIX)gcc
 RISCV_GCC_OPTS = -MMD -MP -Wall -Werror -D__NO_INLINE__ -DENABLE_ATOMICS -mcmodel=medany -O2 -std=gnu99 -Wno-unused -Wno-attributes -fno-delete-null-pointer-checks  -I. -I..
-RISCV_LINK_OPTS = -nostartfiles -nostdlib -static -T fsbl.ld -L../softfloat -lsoftfloat -lgcc
+RISCV_LINK_OPTS = -nostartfiles -nostdlib -static -T bbl.ld -L../softfloat -lsoftfloat -lgcc
 RISCV_DUMP = $(RISCV_PREFIX)objdump
 RISCV_DUMP_OPTS = -D -S -l
 
@@ -46,7 +46,7 @@ C_OBJS = \
 	console.o \
 	vm.o \
 	string.o \
-	fsbl.o \
+	bbl.o \
 
 S_OBJS = \
 	mentry.o \
@@ -67,7 +67,11 @@ DRIVER_OBJS = \
 DRIVER_HEADERS += \
 	$(wildcard $(DRIVER_DIR)/*.h) \
 
-junk += $(C_OBJS) $(S_OBJS) $(DRIVER_OBJS)
+junk += \
+	$(C_OBJS) $(S_OBJS) $(DRIVER_OBJS) \
+	$(patsubst %.o, %.d, $(C_OBJS)) \
+	$(patsubst %.o, %.d, $(S_OBJS)) \
+	$(patsubst %.o, %.d, $(DRIVER_OBJS)) \
 
 #--------------------------------------------------------------------
 # Building Targets

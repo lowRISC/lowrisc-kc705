@@ -112,6 +112,6 @@ uint_fast64_t softfloat_commonNaNToF64UI( struct commonNaN );
 *----------------------------------------------------------------------------*/
 uint_fast64_t softfloat_propagateNaNF64UI( uint_fast64_t, uint_fast64_t );
 
-#include "../fsbl/mtrap.h"
+#include "../bbl/mtrap.h"
 
 #endif
