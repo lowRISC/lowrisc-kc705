@@ -5,7 +5,7 @@ lowRISC Xilinx KC705 Board Developement Demo
 
 Requirement:
 
-  **Vivado 2014.4** and **lowRISC develope environment**
+  **Vivado 2015.3** and **lowRISC develope environment**
 
 How to run the demo:
 --------------------------------------------------------

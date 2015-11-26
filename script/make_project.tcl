@@ -1,7 +1,7 @@
 # Xilinx Vivado script
 # Version: Vivado 2015.3
 # Function:
-#   Generate a vivado project for the loRISC SoC
+#   Generate a vivado project for the lowRISC SoC
 
 set mem_data_width {128}
 set axi_id_width {9}
@@ -24,8 +24,8 @@ set proj_dir [get_property directory [current_project]]
 
 # Set project properties
 set obj [get_projects $project_name]
-set_property "board_part" "xilinx.com:kc705:part0:1.1" $obj
 set_property "default_lib" "xil_defaultlib" $obj
+set_property "board_part" "xilinx.com:kc705:part0:1.1" $obj
 set_property "simulator_language" "Mixed" $obj
 
 # Create 'sources_1' fileset (if not found)
@@ -59,7 +59,7 @@ set_property include_dirs [list \
                                [file normalize $origin_dir/generated-src] \
                               ] [get_filesets sources_1]
 
-set_property verilog_define [list FPGA FPGA_FULL] [get_filesets sources_1]
+set_property verilog_define [list FPGA FPGA_FULL KC705] [get_filesets sources_1]
 
 # Set 'sources_1' fileset properties
 set_property "top" "chip_top" [get_filesets sources_1]
@@ -154,7 +154,7 @@ set_property include_dirs [list \
                                [file normalize $origin_dir/generated-src] \
                                [file normalize $proj_dir/$project_name.srcs/sources_1/ip/mig_7series_0/mig_7series_0/example_design/sim] \
                               ] $obj
-#set_property verilog_define [list FPGA FPGA_FULL] $obj
+#set_property verilog_define [list FPGA FPGA_FULL KC705] $obj
 set_property verilog_define [list FPGA] $obj
 
 set_property -name {xsim.elaborate.xelab.more_options} -value {-cc gcc -sv_lib dpi} -objects $obj
