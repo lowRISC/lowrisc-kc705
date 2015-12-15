@@ -37,6 +37,7 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 set files [list \
                [file normalize $origin_dir/generated-src/Top.$CONFIG.v] \
                [file normalize $base_dir/src/main/verilog/chip_top.sv] \
+               [file normalize $base_dir/src/main/verilog/tracer.sv] \
                [file normalize $base_dir/socip/nasti/channel.sv] \
                [file normalize $base_dir/socip/nasti/lite_nasti_reader.sv ] \
                [file normalize $base_dir/socip/nasti/lite_nasti_writer.sv ] \
@@ -113,6 +114,15 @@ set_property -dict [list \
                         CONFIG.C_NUM_TRANSFER_BITS {8}] \
     [get_ips axi_quad_spi_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_quad_spi_0/axi_quad_spi_0.xci]
+
+create_ip -name axi_uartlite -vendor xilinx.com -library ip -version 2.0 -module_name axi_uartlite_0
+set_property -dict [list \
+                        CONFIG.PARITY {Odd} \
+                        CONFIG.C_S_AXI_ACLK_FREQ_HZ_d {50} \
+                        CONFIG.C_BAUDRATE {230400} ] \
+    [get_ips axi_uartlite_0]
+generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_uartlite_0/axi_uartlite_0.xci]
+
 
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {

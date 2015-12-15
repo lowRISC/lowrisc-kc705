@@ -26,6 +26,12 @@ set_property IOSTANDARD LVCMOS25 [get_ports spi_mosi]
 set_property PACKAGE_PIN AC20 [get_ports spi_miso]
 set_property IOSTANDARD LVCMOS25 [get_ports spi_miso]
 
+# Tracer UART Pins
+#set_property PACKAGE_PIN M19 [get_ports trace_rxd]
+#set_property IOSTANDARD LVCMOS25 [get_ports trace_rxd]
+#set_property PACKAGE_PIN K24 [get_ports trace_txd]
+#set_property IOSTANDARD LVCMOS25 [get_ports trace_txd]
+
 
 # Set DCI_CASCADE for DDR3 interface
 set_property slave_banks {32 34} [get_iobanks 33]
