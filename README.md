@@ -1,11 +1,11 @@
-lowRISC Xilinx KC705 Board Developement Demo
+lowRISC Digilent NEXYS4-DDR Board Developement Demo
 ========================================================
 
-(Not a stand-alone git repo. Please clone https://github.com/lowrisc/lowrisc-chip.git to have this as a submodule of <lowrisc-chip>/fpga/board/kc705)
+(Not a stand-alone git repo. Please clone https://github.com/lowrisc/lowrisc-chip.git to have this as a submodule of <lowrisc-chip>/fpga/board/nexys4)
 
 Requirement:
 
-  **Vivado 2015.3** and **lowRISC develope environment**
+  **Vivado 2015.4** and **lowRISC develope environment**
 
 How to run the demo:
 --------------------------------------------------------

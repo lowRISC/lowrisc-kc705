@@ -15,6 +15,10 @@ set_property PACKAGE_PIN M19 [get_ports rxd]
 set_property IOSTANDARD LVCMOS25 [get_ports rxd]
 set_property PACKAGE_PIN K24 [get_ports txd]
 set_property IOSTANDARD LVCMOS25 [get_ports txd]
+set_property PACKAGE_PIN K23 [get_ports rts]
+set_property IOSTANDARD LVCMOS25 [get_ports rts]
+set_property PACKAGE_PIN L27 [get_ports cts]
+set_property IOSTANDARD LVCMOS25 [get_ports cts]
 
 # SD/SPI Pins
 set_property PACKAGE_PIN AC21 [get_ports spi_cs]
@@ -25,7 +29,9 @@ set_property PACKAGE_PIN AB22 [get_ports spi_mosi]
 set_property IOSTANDARD LVCMOS25 [get_ports spi_mosi]
 set_property PACKAGE_PIN AC20 [get_ports spi_miso]
 set_property IOSTANDARD LVCMOS25 [get_ports spi_miso]
-
+# Is this right ?
+set_property PACKAGE_PIN Y21 [get_ports sd_reset]
+set_property IOSTANDARD LVCMOS25 [get_ports sd_reset]
 
 # Set DCI_CASCADE for DDR3 interface
 set_property slave_banks {32 34} [get_iobanks 33]
