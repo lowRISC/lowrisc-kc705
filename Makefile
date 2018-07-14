@@ -155,7 +155,7 @@ $(bitstream): $(lowrisc_srcs)  $(lowrisc_headers) $(verilog_srcs) $(verilog_head
 	$(VIVADO) -mode batch -source ../../common/script/make_bitstream.tcl -tclargs $(project_name)
 
 program: $(bitstream)
-	$(VIVADO) -mode batch -source ../../common/script/program.tcl -tclargs "xc7a100t_0" $(bitstream)
+	$(VIVADO) -mode batch -source ../../common/script/program.tcl -tclargs "xc7k325t_0" $(bitstream)
 
 .PHONY: project vivado bitstream program
 
@@ -208,19 +208,19 @@ $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit: $(boot_mem) src/bo
 	data2mem -bm $(boot_mem) -bd $< -bt $(bitstream) -o b $@
 
 program-updated: $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
-	$(VIVADO) -mode batch -source ../../common/script/program.tcl -tclargs "xc7a100t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
+	$(VIVADO) -mode batch -source ../../common/script/program.tcl -tclargs "xc7k325t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
 
 cfgmem: $(project_name)/$(project_name).runs/impl_1/chip_top.bit
-	$(VIVADO) -mode batch -source ../../common/script/cfgmem.tcl -tclargs "xc7a100t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.bit
+	$(VIVADO) -mode batch -source ../../common/script/cfgmem.tcl -tclargs "xc7k325t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.bit
 
 cfgmem-updated: $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
-	$(VIVADO) -mode batch -source ../../common/script/cfgmem.tcl -tclargs "xc7a100t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
+	$(VIVADO) -mode batch -source ../../common/script/cfgmem.tcl -tclargs "xc7k325t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit
 
 program-cfgmem: $(project_name)/$(project_name).runs/impl_1/chip_top.bit.mcs
-	$(VIVADO) -mode batch -source ../../common/script/program_cfgmem.tcl -tclargs "xc7a100t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.bit.mcs
+	$(VIVADO) -mode batch -source ../../common/script/program_cfgmem.tcl -tclargs "xc7k325t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.bit.mcs
 
 program-cfgmem-updated: $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit.mcs
-	$(VIVADO) -mode batch -source ../../common/script/program_cfgmem.tcl -tclargs "xc7a100t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit.mcs
+	$(VIVADO) -mode batch -source ../../common/script/program_cfgmem.tcl -tclargs "xc7k325t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit.mcs
 
 etherboot: boot0001.bin ../../common/script/recvRawEth
 	../../common/script/recvRawEth -r eth1 boot0001.bin

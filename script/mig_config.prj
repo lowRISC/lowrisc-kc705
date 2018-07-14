@@ -9,7 +9,7 @@
     <LowPower_En>ON</LowPower_En>
     <XADC_En>Enabled</XADC_En>
     <TargetFPGA>xc7k325t-ffg900/-2</TargetFPGA>
-    <Version>2.3</Version>
+    <Version>4.1</Version>
     <SystemClock>Differential</SystemClock>
     <ReferenceClock>Use System Clock</ReferenceClock>
     <SysResetPolarity>ACTIVE HIGH</SysResetPolarity>
@@ -23,7 +23,8 @@
         <VccAuxIO>2.0V</VccAuxIO>
         <PHYRatio>4:1</PHYRatio>
         <InputClkFreq>200</InputClkFreq>
-        <UIExtraClocks>1</UIExtraClocks>
+        <UIExtraClocks>0</UIExtraClocks>
+        <MMCM_VCO>800</MMCM_VCO>
         <MMCMClkOut0>16</MMCMClkOut0>
         <MMCMClkOut1>1</MMCMClkOut1>
         <MMCMClkOut2>1</MMCMClkOut2>
@@ -34,6 +35,7 @@
         <DataMask>1</DataMask>
         <ECC>Disabled</ECC>
         <Ordering>Normal</Ordering>
+        <BankMachineCnt>4</BankMachineCnt>
         <CustomPart>FALSE</CustomPart>
         <NewPartName></NewPartName>
         <RowAddress>14</RowAddress>
@@ -157,16 +159,13 @@
             <Pin VCCAUX_IO="HIGH" IOSTANDARD="LVCMOS15" PADName="AK3" SLEW="" name="ddr3_reset_n" IN_TERM="" />
             <Pin VCCAUX_IO="HIGH" IOSTANDARD="SSTL15" PADName="AE9" SLEW="" name="ddr3_we_n" IN_TERM="" />
         </PinSelection>
-        <System_Clock>
-            <Pin PADName="AD12/AD11(CC_P/N)" Bank="33" name="sys_clk_p/n" />
-        </System_Clock>
         <System_Control>
             <Pin PADName="No connect" Bank="Select Bank" name="sys_rst" />
             <Pin PADName="No connect" Bank="Select Bank" name="init_calib_complete" />
             <Pin PADName="No connect" Bank="Select Bank" name="tg_compare_error" />
         </System_Control>
         <TimingParameters>
-            <Parameters twtr="7.5" trrd="6" trefi="7.8" tfaw="30" trtp="7.5" tcke="5" trfc="110" trp="13.125" tras="35" trcd="13.125" />
+            <Parameters twtr="7.5" trrd="6" trefi="7.8" tfaw="30" trtp="7.5" tcke="5" trfc="110" trp="13.75" tras="35" trcd="13.75" />
         </TimingParameters>
         <mrBurstLength name="Burst Length" >8 - Fixed</mrBurstLength>
         <mrBurstType name="Read Burst Type and Length" >Sequential</mrBurstType>
@@ -192,8 +191,8 @@
         <AXIParameters>
             <C0_C_RD_WR_ARB_ALGORITHM>RD_PRI_REG</C0_C_RD_WR_ARB_ALGORITHM>
             <C0_S_AXI_ADDR_WIDTH>30</C0_S_AXI_ADDR_WIDTH>
-            <C0_S_AXI_DATA_WIDTH>128</C0_S_AXI_DATA_WIDTH>
-            <C0_S_AXI_ID_WIDTH>9</C0_S_AXI_ID_WIDTH>
+            <C0_S_AXI_DATA_WIDTH>64</C0_S_AXI_DATA_WIDTH>
+            <C0_S_AXI_ID_WIDTH>4</C0_S_AXI_ID_WIDTH>
             <C0_S_AXI_SUPPORTS_NARROW_BURST>0</C0_S_AXI_SUPPORTS_NARROW_BURST>
         </AXIParameters>
     </Controller>

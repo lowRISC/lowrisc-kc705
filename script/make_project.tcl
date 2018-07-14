@@ -120,6 +120,18 @@ generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs
 # Clock generators
 create_ip -name clk_wiz -vendor xilinx.com -library ip -module_name clk_wiz_0
 set_property -dict [list \
+                        CONFIG.CLK_IN1_BOARD_INTERFACE {sys_diff_clock} \
+                        CONFIG.CLK_IN2_BOARD_INTERFACE {Custom} \
+                        CONFIG.RESET_BOARD_INTERFACE {reset} \
+                        CONFIG.RESET_TYPE {ACTIVE_HIGH} \
+                        CONFIG.PRIM_SOURCE {Differential_clock_capable_pin} \
+                        CONFIG.PRIM_IN_FREQ {100.000} \
+                        CONFIG.CLKIN1_JITTER_PS {50.0} \
+                        CONFIG.MMCM_DIVCLK_DIVIDE {1} \
+                        CONFIG.MMCM_CLKFBOUT_MULT_F {6} \
+                        CONFIG.MMCM_CLKIN1_PERIOD {5.000} \
+                        CONFIG.MMCM_CLKIN2_PERIOD {10.0} \
+                        CONFIG.RESET_PORT {reset} \
                         CONFIG.PRIMITIVE {PLL} \
                         CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {200.000} \
                         CONFIG.RESET_TYPE {ACTIVE_LOW} \
