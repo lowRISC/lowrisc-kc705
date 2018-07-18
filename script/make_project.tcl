@@ -112,8 +112,8 @@ set_property -dict [list \
                         CONFIG.ADDR_WIDTH {30} \
                         CONFIG.DATA_WIDTH $mem_data_width \
                         CONFIG.ID_WIDTH $axi_id_width \
-                        CONFIG.ACLK_ASYNC {0} \
-                        CONFIG.ACLK_RATIO {1:2}] \
+                        CONFIG.ACLK_ASYNC {1} \
+                        CONFIG.SYNCHRONIZATION_STAGES {4}] \
     [get_ips axi_clock_converter_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_clock_converter_0/axi_clock_converter_0.xci]
 
@@ -124,7 +124,7 @@ set_property -dict [list \
                         CONFIG.CLK_IN2_BOARD_INTERFACE {Custom} \
                         CONFIG.RESET_BOARD_INTERFACE {reset} \
                         CONFIG.RESET_TYPE {ACTIVE_HIGH} \
-                        CONFIG.PRIM_SOURCE {Differential_clock_capable_pin} \
+                        CONFIG.PRIM_SOURCE {GLobal_buffer} \
                         CONFIG.PRIM_IN_FREQ {100.000} \
                         CONFIG.CLKIN1_JITTER_PS {50.0} \
                         CONFIG.MMCM_DIVCLK_DIVIDE {1} \
@@ -134,32 +134,30 @@ set_property -dict [list \
                         CONFIG.RESET_PORT {reset} \
                         CONFIG.PRIMITIVE {PLL} \
                         CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {200.000} \
-                        CONFIG.RESET_TYPE {ACTIVE_LOW} \
+                        CONFIG.RESET_TYPE {ACTIVE_HIGH} \
                         CONFIG.CLKOUT1_DRIVES {BUFG} \
                         CONFIG.MMCM_DIVCLK_DIVIDE {1} \
                         CONFIG.MMCM_CLKFBOUT_MULT_F {10} \
                         CONFIG.MMCM_COMPENSATION {ZHOLD} \
                         CONFIG.MMCM_CLKOUT0_DIVIDE_F {5} \
-                        CONFIG.RESET_PORT {resetn} \
-                        CONFIG.CLKOUT1_JITTER {114.829} \
-                        CONFIG.CLKOUT1_PHASE_ERROR {98.575} \
+                        CONFIG.RESET_PORT {reset} \
                         CONFIG.CLKOUT2_DRIVES {BUFG} \
-                        CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {60.000} \
+                        CONFIG.CLKOUT2_REQUESTED_OUT_FREQ {50.000} \
                         CONFIG.CLKOUT2_USED {1} \
-                        CONFIG.CLK_OUT2_PORT {clk_io_uart} \
+                        CONFIG.CLK_OUT2_PORT {clk_cpu} \
                         CONFIG.CLKOUT3_DRIVES {BUFG} \
                         CONFIG.CLKOUT3_REQUESTED_OUT_FREQ {120.000} \
                         CONFIG.CLKOUT3_USED {1} \
                         CONFIG.CLK_OUT3_PORT {clk_pixel} \
                         CONFIG.CLKOUT4_USED {1} \
                         CONFIG.CLKOUT4_DRIVES {BUFG} \
-                        CONFIG.CLKOUT4_REQUESTED_OUT_FREQ {50.000} \
-                        CONFIG.CLK_OUT4_PORT {clk_rmii} \
+                        CONFIG.CLKOUT4_REQUESTED_OUT_FREQ {25.000} \
+                        CONFIG.CLK_OUT4_PORT {clk_mii} \
                         CONFIG.CLKOUT5_USED {1} \
                         CONFIG.CLKOUT5_DRIVES {BUFG} \
-                        CONFIG.CLKOUT5_REQUESTED_OUT_FREQ {50.000} \
+                        CONFIG.CLKOUT5_REQUESTED_OUT_FREQ {25.000} \
                         CONFIG.CLKOUT5_REQUESTED_PHASE {90.000} \
-                        CONFIG.CLK_OUT5_PORT {clk_rmii_quad}] \
+                        CONFIG.CLK_OUT5_PORT {clk_mii_quad}] \
     [get_ips clk_wiz_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci]
 #SD-card clock generator
