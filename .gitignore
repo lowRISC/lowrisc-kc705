@@ -17,3 +17,12 @@ boot.bmm
 *.riscv
 examples
 .Xil
+.cxl.ip/
+.cxl.vcs_mx.version
+README.txt
+boot.bin
+compile_simlib/
+md5
+synopsys_sim.setup
+v_hdmi_tx_ss_0_ex/
+vcs/
