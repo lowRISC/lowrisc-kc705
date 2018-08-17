@@ -258,6 +258,7 @@ tests:  $(lowrisc_headers) | examples/Makefile
 	FPGA_DIR=$(proj_dir) BASE_DIR=$(example_dir) $(MAKE) -C examples eth.hex
 	riscv64-unknown-elf-size examples/eth.riscv
 	riscv64-unknown-elf-objdump -d examples/eth.riscv > examples/eth.dis
+	cp examples/eth.hex $(boot_mem)
 
 empty:
 	mkdir -p examples
