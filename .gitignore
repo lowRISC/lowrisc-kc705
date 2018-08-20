@@ -20,7 +20,7 @@ examples
 .cxl.ip/
 .cxl.vcs_mx.version
 README.txt
-boot.bin
+boot*.bin
 compile_simlib/
 md5
 synopsys_sim.setup
