@@ -11,10 +11,10 @@ endif
 default: project
 
 top_dir = $(abspath ../../..)
-base_dir = $(abspath ../../../rocket-chip)
+base_dir = $(abspath ../../../boom-template)
 proj_dir = $(abspath .)
 mem_gen = $(abspath ../../..)/fpga/common/fpga_mem_gen
-generated_dir = $(base_dir)/vsim/generated-src
+generated_dir = $(base_dir)/verisim/generated-src
 
 glip_dir = $(abspath ../../..)/opensocdebug/glip/src
 osd_dir = $(abspath ../../..)/opensocdebug/hardware
@@ -22,7 +22,7 @@ example_dir = $(abspath ../../..)/fpga/bare_metal/examples
 
 project_name = lowrisc-chip-imp
 BACKEND ?= v
-CONFIG=DefaultConfig
+CONFIG=BoomConfig
 
 VIVADO = vivado
 
@@ -34,7 +34,7 @@ $(error Please set environment variable RISCV. Please take a look at README)
 endif
 
 MODEL := TestHarness
-PROJECT := freechips.rocketchip.system
+PROJECT := boom.system.TestHarness
 CXX := g++
 CXXFLAGS := -O1
 JVM_MEMORY ?= 2G
@@ -75,12 +75,10 @@ linux_timeout_cycles = 5000000000
 
 boot_mem = src/boot.mem
 bootrom_img = $(base_dir)/bootrom/bootrom.img
-fpga_srams = $(generated_dir)/$(PROJECT).$(CONFIG).fpga_srams.v
 fpga_src = $(generated_dir)/$(PROJECT).$(CONFIG).v
 
 lowrisc_srcs = \
-	$(fpga_src) \
-	$(fpga_srams)
+	$(fpga_src)
 
 lowrisc_headers = \
 	$(abspath ../../..)/src/main/verilog/consts.vh \
@@ -116,11 +114,7 @@ test_cxx_headers = \
 #--------------------------------------------------------------------
 
 verilog: $(lowrisc_headers)
-	make -C ../../../rocket-chip/vsim verilog
-
-$(fpga_srams): $(generated_dir)/$(PROJECT).$(CONFIG).conf $(mem_gen)
-	$(mem_gen) $< > $@.tmp
-	mv -f $@.tmp $@
+	make -C $(base_dir)/verisim default
 
 $(fpga_src):
 

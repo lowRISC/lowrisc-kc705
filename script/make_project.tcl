@@ -36,7 +36,7 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 
 # Set 'sources_1' fileset object
 set files [list \
-               [file normalize $base_dir/rocket-chip/vsim/generated-src/freechips.rocketchip.system.$CONFIG.v] \
+               [file normalize $base_dir/boom-template/verisim/generated-src/boom.system.TestHarness.$CONFIG.v] \
                [file normalize $base_dir/src/main/verilog/chip_top.sv] \
                [file normalize $base_dir/src/main/verilog/periph_soc.sv] \
                [file normalize $base_dir/src/main/verilog/framing_top_mii.sv] \
