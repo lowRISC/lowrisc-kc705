@@ -216,13 +216,13 @@ program-cfgmem: $(project_name)/$(project_name).runs/impl_1/chip_top.bit.mcs
 program-cfgmem-updated: $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit.mcs
 	$(VIVADO) -mode batch -source ../../common/script/program_cfgmem.tcl -tclargs "xc7k325t_0" $(project_name)/$(project_name).runs/impl_1/chip_top.new.bit.mcs
 
-etherlocal: ../../../rocket-chip/riscv-tools/riscv-pk/build/bbl ../../common/script/recvRawEth
+etherlocal: $(base_dir)/rocket-chip/riscv-tools/riscv-pk/build/bbl ../../common/script/recvRawEth
 	cp $< boot.bin
 	riscv64-unknown-elf-strip boot.bin
 	../../common/script/recvRawEth -d -r -s 192.168.0.51 boot.bin
 	../../common/script/recvRawEth -b -s 192.168.0.51 boot.bin # boot again in case they don't get the message
 
-etherremote: ../../../rocket-chip/riscv-tools/riscv-pk/build/bbl ../../common/script/recvRawEth
+etherremote: $(base_dir)/rocket-chip/riscv-tools/riscv-pk/build/bbl ../../common/script/recvRawEth
 	cp $< boot.bin
 	riscv64-unknown-elf-strip boot.bin
 	../../common/script/recvRawEth -r -s lowrisc5.sm.cl.cam.ac.uk boot.bin
