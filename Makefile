@@ -113,10 +113,10 @@ test_cxx_headers = \
 # Build Verilog
 #--------------------------------------------------------------------
 
-verilog: $(lowrisc_headers)
-	make -C $(base_dir)/verisim default
+verilog: $(fpga_src)
 
 $(fpga_src):
+	make -C $(base_dir)/verisim default
 
 .SECONDARY: $(firrtl) $(verilog)
 
